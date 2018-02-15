@@ -6,7 +6,7 @@ JetBrains plugin.
 
 Based on the solution found by Bosko Popovic and well documented by Mohammad Naghavi. Working
 with JS code in WebView is now very comfortable. Not IDE comfortable, but a whole lot more
-productive than trying to figure buts through log messages.
+productive than trying to figure bugs through log messages.
 
 This file is mostly a repeat of one in mohamnag/javafx_webview_debugger project with some
 changes to reflect being able to run multiple debugging sessions on a single server.
