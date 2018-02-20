@@ -5,11 +5,34 @@ instead of org.eclipse.jetty. Much lighter on size and painless to get working, 
 JetBrains plugin.
 
 Based on the solution found by Bosko Popovic and well documented by Mohammad Naghavi. Working
-with JS code in WebView is now very comfortable. Not IDE comfortable, but a whole lot more
-productive than trying to figure bugs through log messages.
+with JS code in WebView is now comfortable. Not IDE comfortable, but a whole lot more productive
+than trying to figure bugs through log messages.
 
-This file is mostly a repeat of one in mohamnag/javafx_webview_debugger project with some
-changes to reflect being able to run multiple debugging sessions on a single server.
+The limitations for chrome dev tools in JavaFX WebView are significant. The console evaluation
+do not work and console log/warn/error/debug from scripts does not make it to the debugger
+console.
+
+With hacked code I was able to make dev tools work with WebView and vice versa. There are still
+some limitations but now the console in the debugger works as expected, with completions,
+evaluations and console logging from scripts. It no longer core dumps and quits right out of
+Java, which was happening on a regular basis. JavaFx WebView is no Chromium.
+
+I will be updating this library with the changes but it is a bit of work since my plugin
+[Markdown Navigator] is for IntelliJ and has a few JetBrains API specifics in it which will take
+some effort to remove for use on any JavaFx WebView project.
+
+Having worked with log based debugging of JavaScript for two years, using Chrome Dev Tools is
+like suddenly discovering eyesight. I can now consider adding JavaScript based features which I
+avoided like the plague because there are enough differences from a regular browser to make
+these "small" jobs into tedious career decisions. 
+
+Here is a screenshot of the dev tools running with JavaFX WebView, showing off the console
+logging from scripts:
+
+![DevTools](images/DevTools.png)
+
+The rest of this file is mostly a copy of one in mohamnag/javafx_webview_debugger project with
+some changes to reflect being able to run multiple debugging sessions on a single server.
 
 Using debugger is done in three main steps:
 1. Starting debug server
@@ -74,8 +97,8 @@ chrome-devtools://devtools/bundled/inspector.html?ws=localhost:51742/?1
 Where 1, 2, 3, ... is the session number you passed to the `DevToolsDebuggerServer` constructor
 and 51742 is the port passed to the debug server.
 
-**NOTE**: since the web-socket server is a shared static instance, all sessions will have to use the
-same port number.
+**NOTE**: since the web-socket server is a shared static instance, all sessions will have to use
+the same port number.
 
 ### Clean up
 
@@ -99,11 +122,13 @@ DevToolsDebuggerServer.shutdownWebSocketServer();
 ## No Library Installation
 
 Code is too small and will most likely need to be customized for your project. Add the two small
-files to your project and modify to your needs. Add [TooTallNate/Java-WebSocket] as a dependency.
+files to your project and modify to your needs. Add [TooTallNate/Java-WebSocket] as a
+dependency.
 
 These files were pulled from a project after I got it all working nicely. Removed IntelliJ API
 related code and put them here so they can be of use to others.
 
+<!-- 
 ### Maven
 
 To use maven add this dependency to your pom.xml:
@@ -129,6 +154,7 @@ Then you can just add the latest version to your build.
 ```
 compile "org.java-websocket:Java-WebSocket:1.3.7"
 ```
+ -->
 
 JetBrains IntelliJ project files included if you need to reference them, Library is configured
 and downloaded into `lib/`
@@ -199,11 +225,12 @@ function initializeMap() {
     });
 
     map.addLayer(mapLayer);
-    
+
     console.log("Map initialized!"); // This will appear in the JavaFX console
 }
 ```
 
+[Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [mohamnag/javafx_webview_debugger]: https://github.com/mohamnag/javafx_webview_debugger
 [TooTallNate/Java-WebSocket]: https://github.com/TooTallNate/Java-WebSocket
 
