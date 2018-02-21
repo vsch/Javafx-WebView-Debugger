@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="MarkdownNavigatorHistory">
-    <PasteImageHistory filename="DevTools" directory="$PROJECT_DIR$/images" onPasteImageTargetRef="3" onPasteLinkText="0" onPasteImageElement="1" onPasteLinkElement="1" onPasteReferenceElement="2" cornerRadius="14" borderColor="-1829375" transparentColor="-1" borderWidth="1" trimTop="0" trimBottom="0" trimLeft="0" trimRight="0" transparent="false" roundCorners="true" showPreview="true" bordered="true" scaled="true" cropped="false" hideInapplicableOperations="false" scale="40" scalingInterpolation="1" transparentTolerance="0" linkFormat="0">
+    <PasteImageHistory filename="DevTools" directory="$PROJECT_DIR$/images" onPasteImageTargetRef="3" onPasteLinkText="0" onPasteImageElement="1" onPasteLinkElement="1" onPasteReferenceElement="2" cornerRadius="14" borderColor="-3669971" transparentColor="-1" borderWidth="1" trimTop="2" trimBottom="2" trimLeft="2" trimRight="2" transparent="false" roundCorners="true" showPreview="true" bordered="true" scaled="true" cropped="true" hideInapplicableOperations="false" scale="40" scalingInterpolation="1" transparentTolerance="0" linkFormat="0">
       <directories>
-        <option name="$PROJECT_DIR$" />
         <option name="$PROJECT_DIR$/images" />
+        <option name="$PROJECT_DIR$" />
       </directories>
       <filenames />
     </PasteImageHistory>
