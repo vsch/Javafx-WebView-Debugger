@@ -1,4 +1,5 @@
-# JavaFX WebView Debugger Connection for Chrome Dev Tools
+# JavaFX WebView Debugger 
+##### Via WebSocket connection to Google Chrome Dev Tools
 
 Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Java-WebSocket]
 instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
