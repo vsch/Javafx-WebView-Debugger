@@ -52,7 +52,7 @@
         <option name="SIM_TOC_BLANK_LINE_SPACER" value="true" />
       </ParserOptions>
     </ParserSettings>
-    <HtmlSettings headerTopEnabled="false" headerBottomEnabled="false" bodyTopEnabled="false" bodyBottomEnabled="false" embedUrlContent="false" addPageHeader="false" embedImages="false" embedHttpImages="false" imageUriSerials="false">
+    <HtmlSettings headerTopEnabled="false" headerBottomEnabled="false" bodyTopEnabled="false" bodyBottomEnabled="false" embedUrlContent="false" addPageHeader="true" embedImages="false" embedHttpImages="false" imageUriSerials="true">
       <GeneratorProvider>
         <provider providerId="com.vladsch.idea.multimarkdown.editor.javafx.html.generator" providerName="JavaFx HTML Generator" />
       </GeneratorProvider>
@@ -67,6 +67,7 @@
       </StylesheetProvider>
       <ScriptProviders>
         <provider providerId="com.vladsch.idea.multimarkdown.editor.github-collapse-in-comment.html.script" providerName="Details tag opener" />
+        <provider providerId="com.vladsch.idea.multimarkdown.editor.github-collapse-markdown.html.script" providerName="GitHub Collapse Markdown" />
       </ScriptProviders>
       <cssText>code {
     background-color: rgba(255, 0, 102, 0.06);
