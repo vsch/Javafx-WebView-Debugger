@@ -4,37 +4,67 @@ Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Ja
 instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
 JetBrains plugin.
 
-Based on the solution found by Bosko Popovic and well documented by Mohammad Naghavi. Working
-with JS code in WebView is now comfortable. Not IDE comfortable, but a whole lot more productive
-than trying to figure bugs through log messages.
+In turn that library was based on the solution found by Bosko Popovic and well documented by
+Mohammad Naghavi. Working with JS code in WebView became tolerable. Not IDE comfortable, but a
+whole lot more productive than trying to figure bugs through log messages.
 
-The limitations for chrome dev tools in JavaFX WebView are significant. The console evaluation
-do not work and console log/warn/error/debug from scripts does not make it to the debugger
-console.
+The limitations for chrome dev tools in JavaFX WebView with a bare-bones implementation were
+significant. The console evaluations did not work and none of the console api methods from
+scripts did not make it to the debugger console.
 
-With hacked code I was able to make dev tools work with WebView and vice versa. There are still
-some limitations but now the console in the debugger works as expected, with completions,
-evaluations and console logging from scripts. It no longer core dumps and quits right out of
-Java, which was happening on a regular basis. JavaFx WebView is no Chromium.
+Custom code to handle the dev tools protocol makes dev tools work with WebView and vice versa.
+There are still some limitations but these have to do with the fact that the debugger cannot
+provide dev tools with much information until the JSBridge is established to allow JavaScript to
+reach the Java world.
 
-I will be updating this library with the changes but it is a bit of work since my plugin
-[Markdown Navigator] is for IntelliJ and has a few JetBrains API specifics in it which will take
-some effort to remove for use on any JavaFx WebView project.
+Now the console in the debugger works as expected, with completions, evaluations and console
+logging from scripts, stepping in/out/into, break points and especially initialization debugging
+before the JSBridge to JavaScript is established to make minced meat of initialization
+debugging.
 
-Having worked with log based debugging of JavaScript for two years, using Chrome Dev Tools is
-like suddenly discovering eyesight. I can now consider adding JavaScript based features which I
-avoided like the plague because there are enough differences from a regular browser to make
-these "small" jobs into tedious career decisions. 
+The current version of the library is the bare-bones implementation and just usable. I will be
+updating it with the full feature version, you'll almost think you are working in Chrome. 
 
-Here is a screenshot of the dev tools running with JavaFX WebView, showing off the console
-logging from scripts:
+It will take a bit of work since the code I use is in an [IntelliJ IDEA] plugin,
+[Markdown Navigator]. The source is a mix of Java and [Kotlin] with a good measure of JetBrains
+API specifics and will take some effort to remove all these for use on any JavaFx WebView
+project and to re-test to make sure it works. The inner working of the debugger are very fragile
+and easy to make it core-dump right out of the application.
+
+If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
+me and I will see if we can make this happen sooner than later. A little motivation can go a
+long way.
+
+Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
+logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
 
-The rest of this file is mostly a copy of one in mohamnag/javafx_webview_debugger project with
-some changes to reflect being able to run multiple debugging sessions on a single server.
+### JSBridge Provided Debugging Support  
+
+The missing functionality from the WebView debugger is implemented via a proxy that gets between
+chrome dev tools and the debugger to fill in the blanks for between the two to massage the
+conversation to allow chrome dev tools to do their magic.
+
+For this to work, some JavaScript and the `JSBridge` instance need to work together to provide
+the essential glue. The implementation is done so that outside of this code the rest of the
+JavaScript code can be oblivious to whether the JSBridge is already established or not. Since
+the location information for console log api is one of the missing pieces in the WebView
+debugger, any console log calls before the JSBridge is established will not have caller
+identification and will instead point to the initialization code that generates the cached log
+calls generated before the connection was established.
+
+The `JSBridge` implementation also provides a mechanism for data persistence between page
+reloads. It is generic enough if all the data you need to persist can be `JSON.stringify'd`
+because the implementation does a call back to the WebView engine to serialize the arguments,
+and on page generation inserts this source into the page to allow scripts access to this data
+before the `JSBridge` is established.
+
+**The rest of this file is mostly a copy of one in [mohamnag/javafx_webview_debugger] project**
+with some changes to reflect being able to run multiple debugging sessions on a single server.
 
 Using debugger is done in three main steps:
+
 1. Starting debug server
 2. Connecting chrome debugger
 3. Clean up
@@ -230,6 +260,8 @@ function initializeMap() {
 }
 ```
 
+[IntelliJ IDEA]: http://www.jetbrains.com/idea
+[Kotlin]: http://kotlinlang.org
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [mohamnag/javafx_webview_debugger]: https://github.com/mohamnag/javafx_webview_debugger
 [TooTallNate/Java-WebSocket]: https://github.com/TooTallNate/Java-WebSocket
