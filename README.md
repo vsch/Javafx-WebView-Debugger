@@ -4,7 +4,8 @@
 
 Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Java-WebSocket]
 instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
-JetBrains plugin.
+JetBrains plugin. *(Found that the cause for this was that Netty is already used by IntelliJ IDEA
+and the jar used by the IDE has to be used, otherwise `ClassNotFound` exceptions will result)*
 
 In turn that library was based on the solution found by Bosko Popovic and well documented by
 Mohammad Naghavi. Working with JS code in WebView became tolerable. Not IDE comfortable, but a
