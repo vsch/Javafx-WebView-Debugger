@@ -4,44 +4,80 @@
 
 Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Java-WebSocket]
 instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
-JetBrains plugin. *(Found that the cause for this was that Netty is already used by IntelliJ IDEA
-and the jar used by the IDE has to be used, otherwise `ClassNotFound` exceptions will result)*
+JetBrains plugin. *(Found that the cause for this was that Netty is already used by IntelliJ
+IDEA and the jar used by the IDE has to be used, otherwise `ClassNotFound` exceptions will
+result)*
 
 In turn that library was based on the solution found by Bosko Popovic and well documented by
 Mohammad Naghavi. Working with JS code in WebView became tolerable. Not IDE comfortable, but a
 whole lot more productive than trying to figure bugs through log messages.
 
-The limitations for chrome dev tools in JavaFX WebView with a bare-bones implementation were
-significant. The console evaluations did not work and none of the console api calls from scripts
-made it to the debugger console.
-
-Custom code to handle the dev tools protocol made Dev Tools work with WebView and vice versa.
-There are still some limitations but these have to do with the fact that the debugger cannot
-provide Dev Tools with much information until the custom `JSBridge` is established to allow
-JavaScript to reach the Java world.
-
-Now the console in the debugger works as expected, with completions, evaluations and console
-logging from scripts, stepping in/out/into, break points and especially initialization debugging
-to handle the difficulty of figuring out what went wrong before the JSBridge to JavaScript is
-established. Makes minced meat of initialization debugging.
-
-The current version of the library is the bare-bones implementation and just usable. I will be
-updating it with the full feature version.
-
-It will take a bit of work since the code I use is in an [IntelliJ IDEA] plugin,
-[Markdown Navigator]. The source is a mix of Java and [Kotlin] with a good measure of JetBrains
-API specifics and will take some effort to remove all these for use on any JavaFx WebView
-project and to re-test to make sure it works. The inner working of the debugger are very fragile
-and easy to make it core-dump right out of the application.
-
-If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
-me and I will see if we can make this happen sooner than later. A little motivation can go a
-long way.
-
 Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
 logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
+
+The limitations for chrome dev tools in JavaFX WebView with a bare-bones implementation are
+significant. The console does not work and none of the console api calls from scripts made it to
+the debugger console. No commandLineAPI for the same reason.
+
+I implemented a proxy to get between dev tools protocol and WebView. There are still some
+limitations but these have to do with the fact that the debugger cannot provide Dev Tools with
+much information until the custom `JSBridge` is established to allow JavaScript to reach the
+Java world.
+
+Now the console in the debugger works as expected, with completions, evaluations and console
+logging from scripts, stepping in/out/into, break points and especially initialization debugging
+to handle the difficulty of figuring out what went wrong before the JSBridge to JavaScript is
+established. Makes minced meat of script initialization debugging.
+
+The current version of the library is the bare-bones implementation and just usable. I will be
+updating it with the full feature version. It will take a bit of work since the code I use is in
+an [IntelliJ IDEA] plugin, [Markdown Navigator].
+
+The source is a mix of Java and [Kotlin] with a good measure of JetBrains API specifics and will
+take some effort to remove all these for use on any JavaFx WebView project and to re-test to
+make sure it works. The inner working of the debugger are very fragile and easy to make it
+core-dump right out of the application.
+
+If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
+me and I will see if we can make this happen sooner than later. Knowing that someone needs this
+will provide a little motivation to getting it done. A little motivation can go a long way.
+
+#### What is working
+
+* all `console` functions: `assert`, `clear`, `count`, `debug`, `dir`, `dirxml`, `error`,
+  `exception`, `group`, `groupCollapsed`, `groupEnd`, `info`, `log`, `profile`, `profileEnd`,
+  `select`, `table`, `time`, `timeEnd`, `trace`, `warn`. With added extras to output to the Java
+  console: `print`, `println`
+* all commandLineAPI functions implemented by JavaFX WebView: `$`, `$$`, `$x`, `dir`, `dirxml`,
+  `keys`, `values`, `profile`, `profileEnd`, `table`, `monitorEvents`, `unmonitorEvents`,
+  `inspect`, `copy`, `clear`, `getEventListeners`, `$0`, `$_`, `$exception`
+  * Some limitations do exist because `Runtime.evaluate` is simulated. Otherwise, there was no
+    way to get the stack frame for any console log calls that would result from the evaluation.
+    Mainly, it caused the application to exit with a core dump more often than not. I figured it
+    was more important to have the caller location for console logs than for the commandLineAPI
+    calls.
+* No longer necessary to instrument the page to have `JSBridge` support code working. Only
+  requires a page reload from WebView or Dev Tools.
+* Ability to debug break on page reload to debug scripts running before JSBridge is established
+* Safely stop debug session from Dev Tools or WebView side. This should have been easy but
+  turned out to be the hardest part to solve. Any wrong moves or dangling references would bring
+  down the whole application with a core-dump message.
+
+#### In progress
+
+* highlighting of elements hovered over in the element tree of dev tools. Node resolution is
+  working. Kludged highlighting by setting a class on the element instead of using an overlay
+  element or the proper margin, borders, padding and container size.
+
+#### Not done
+
+* Debugger paused overlay
+
+#### Probably not doable
+
+* profiling not available. Don't know enough about what's needed to say whether it is doable.
 
 ### JSBridge Provided Debugging Support  
 
@@ -50,25 +86,25 @@ chrome dev tools and the debugger to fill in the blanks and to massage the conve
 chrome dev tools to do their magic.
 
 For this to work, some JavaScript and the `JSBridge` instance need to work together to provide
-the essential glue. The implementation is done so that outside of this code the rest of the
-JavaScript can be oblivious to whether the `JSBridge` is already established or not. Since
-console log api is one of the missing pieces in the WebView debugger, any console log calls
-before the `JSBridge` is established **will not have caller identification** and will instead
-point to the initialization code that played back the cached log calls generated before the
-connection was established.
+the essential glue. The implementation is confined to the initialization script. Most other
+scripts can be oblivious to whether the `JSBridge` is established or not. Console log api is one
+of the missing pieces in the WebView debugger, any console log calls made before the `JSBridge`
+to Java is established **will not have caller identification** and will instead point to the
+initialization code that played back the cached log calls generated before the connection was
+established.
 
 The `JSBridge` implementation also provides a mechanism for data persistence between page
 reloads. It is generic enough if all the data you need to persist can be `JSON.stringify'd`
 because the implementation does a call back to the WebView engine to serialize the passed in
 state argument. This text will need to be inserted into the generated HTML page to allow scripts
-access to their state before the `JSBridge` is established. Alternately, scripts can register
-for a callback when the `JSBridge` is established.
+access to their state before the `JSBridge` is hooked in. Scripts can also register for a
+callback when the `JSBridge` is established.
 
 The down side of the latter approach, is by the time this happens, WebView has already visually
-updated the page. If the script is responsible for any visual modification of the page before
-display then the unmodified version will flash on before the script is run.
+updated the page. If the script is responsible for any visual modification of the page based on
+persisted state then the unmodified version will flash on screen before the script is run.
 
-Allowing scripts to get their state before `JSBridge` is established will make for smoother page
+Allowing scripts to get their state before `JSBridge` is established makes for smoother page
 refresh.
 
 **The rest of this file is mostly a copy of one in [mohamnag/javafx_webview_debugger] project**
