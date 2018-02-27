@@ -25,7 +25,7 @@ I implemented a proxy to get between dev tools protocol and WebView. There are s
 limitations but mostly arise until a `JSBridge` connection is setup.
 
 Now the console in the debugger works as expected, with completions, evaluations and console
-logging from scripts, stepping in/out/into, break points and especially initialization debugging
+logging from scripts, stepping in/out/over, break points and especially initialization debugging
 to handle the difficulty of figuring out what went wrong before the JSBridge to JavaScript is
 established. Makes minced meat of script initialization debugging.
 
