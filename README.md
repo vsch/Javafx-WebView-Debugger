@@ -5,7 +5,7 @@
 Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Java-WebSocket]
 instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
 JetBrains plugin. *(Found that the cause for this was that Netty is already used by IntelliJ
-IDEA and the jar used by the IDE has to be used, otherwise `ClassNotFound` exceptions will
+IDEA and the plugin must use same jar as the IDE, otherwise `ClassNotFound` exceptions will
 result)*
 
 In turn that library was based on the solution found by Bosko Popovic and well documented by
@@ -22,23 +22,20 @@ significant. The console does not work and none of the console api calls from sc
 the debugger console. No commandLineAPI for the same reason.
 
 I implemented a proxy to get between dev tools protocol and WebView. There are still some
-limitations but these have to do with the fact that the debugger cannot provide Dev Tools with
-much information until the custom `JSBridge` is established to allow JavaScript to reach the
-Java world.
+limitations but mostly arise until a `JSBridge` connection is setup.
 
 Now the console in the debugger works as expected, with completions, evaluations and console
 logging from scripts, stepping in/out/into, break points and especially initialization debugging
 to handle the difficulty of figuring out what went wrong before the JSBridge to JavaScript is
 established. Makes minced meat of script initialization debugging.
 
-The current version of the library is the bare-bones implementation and just usable. I will be
-updating it with the full feature version. It will take a bit of work since the code I use is in
-an [IntelliJ IDEA] plugin, [Markdown Navigator].
-
-The source is a mix of Java and [Kotlin] with a good measure of JetBrains API specifics and will
-take some effort to remove all these for use on any JavaFx WebView project and to re-test to
-make sure it works. The inner working of the debugger are very fragile and easy to make it
-core-dump right out of the application.
+The current version in this repository is the bare-bones implementation and just usable. I will
+be updating it with the full featured version as soon as I get the chance. The code I use is in
+an [IntelliJ IDEA] plugin, [Markdown Navigator]. It is a mix of Java and [Kotlin] with a good
+measure of JetBrains API specifics. To convert the code for use on any JavaFx WebView project is
+a bit of an effort. The inner working of the debugger are very fragile and easy to make it
+core-dump right out of the application and any changes need to be thoroughly tested with a real
+debugger not a mock up.
 
 If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
 me and I will see if we can make this happen sooner than later. Knowing that someone needs this
