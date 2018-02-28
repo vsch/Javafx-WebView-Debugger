@@ -1,13 +1,14 @@
 # JavaFX WebView Debugger 
 ##### Via WebSocket connection to Google Chrome Dev Tools
 
-[![Build status](https://travis-ci.org/vsch/javafx-webview-debugger.svg?branch=master)](https://travis-ci.org/vsch/javafx-webview-debugger)
+[![Build status](https://travis-ci.org/vsch/Javafx-WebView-Debugger.svg?branch=master)](https://travis-ci.org/vsch/Javafx-WebView-Debugger)
 [![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/javafx-webview-debugger.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vladsch.javafx-webview-debugger%22)
 
 Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
 logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
+
 
 ### Quick Start
 
@@ -56,7 +57,7 @@ With any functionality specific to my project added using the API of this librar
 
 I will be creating an example project based on Oracle's WebViewSample app with debugging
 implemented. It is easier to create and see a working example than to write a lot of words
-explaining how to do it. This will come later
+explaining how to do it. This will come later.
 
 If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
 me and I will see if we can make this happen sooner than later. Knowing that someone needs this

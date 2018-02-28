@@ -1,5 +1,3 @@
-dist: precise
-
 jdk:
   - oraclejdk8
 
