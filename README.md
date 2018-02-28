@@ -1,41 +1,62 @@
 # JavaFX WebView Debugger 
-
 ##### Via WebSocket connection to Google Chrome Dev Tools
 
-Based on [mohamnag/javafx_webview_debugger] but rewritten to use [TooTallNate/Java-WebSocket]
-instead of org.eclipse.jetty. Much lighter on size and painless to get working, at least in a
-JetBrains plugin. *(Found that the cause for this was that Netty is already used by IntelliJ
-IDEA and the plugin must use same jar as the IDE, otherwise `ClassNotFound` exceptions will
-result)*
-
-In turn that library was based on the solution found by Bosko Popovic and well documented by
-Mohammad Naghavi. Working with JS code in WebView became tolerable. Not IDE comfortable, but a
-whole lot more productive than trying to figure bugs through log messages.
+[![Build status](https://travis-ci.org/vsch/javafx-webview-debugger.svg?branch=master)](https://travis-ci.org/vsch/javafx-webview-debugger)
+[![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/javafx-webview-debugger.svg)](https://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.vladsch.javafx-webview-debugger%22)
 
 Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
 logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
 
-The limitations for chrome dev tools in JavaFX WebView with a bare-bones implementation are
-significant. The console does not work and none of the console api calls from scripts made it to
-the debugger console. No commandLineAPI for the same reason.
+### Quick Start
 
-I implemented a proxy to get between dev tools protocol and WebView. There are still some
-limitations but mostly arise until a `JSBridge` connection is setup.
+For Maven:
+
+```xml
+<dependency>
+    <groupId>com.vladsch.javafx-webview-debugger</groupId>
+    <artifactId>javafx-webview-debugger</artifactId>
+    <version>LATEST</version>
+</dependency>
+```
+
+A WebViewSample application modified for debugging will be added shortly.
+
+#### Credit where credit is due
+
+I found out about the possibility of having any debugger for JavaFX WebView in
+[mohamnag/javafx_webview_debugger]. That implementation in turn was based on the solution found
+by Bosko Popovic. 
+
+I am grateful to Bosko Popovic for discovering the availability and to Mohammad Naghavi creating
+an implementation of the solution. Without their original effort this solution would not be
+possible.
+
+### Finally real debugging for JavaFX WebView
+
+Working with JavaScript code in WebView was a debugging nightmare that I tried to avoid. My
+excitement about having a real debugger diminished when I saw how little was available with a
+bare-bones implementation due to WebView's lack of a full Dev Tools protocol. The console did
+not work and none of the console api calls from scripts made it to the Dev Tools console. No
+commandLineAPI for the same reason. Having to use logs for these is last century.
+
+A proxy to get between Chrome Dev Tools and WebView solved most of the WebView debugging
+protocol limitations. It also allowed to prevent conditions that caused WebView to crash and
+bring the rest of the application with it. I don't mean a Java exception. I mean a core dump and
+sudden exit of the application. For my use cases this is not an acceptable option.
 
 Now the console in the debugger works as expected, with completions, evaluations and console
-logging from scripts, stepping in/out/over, break points and especially initialization debugging
-to handle the difficulty of figuring out what went wrong before the JSBridge to JavaScript is
-established. Makes minced meat of script initialization debugging.
+logging from scripts, stepping in/out/over, break points, caller location one click away and
+initialization debugging to allow pausing of the script before the JSBridge to JavaScript is
+established. Having a real debugger makes minced meat of script initialization issues.
 
-The current version in this repository is the bare-bones implementation and just usable. I will
-be updating it with the full featured version as soon as I get the chance. The code I use is in
-an [IntelliJ IDEA] plugin, [Markdown Navigator]. It is a mix of Java and [Kotlin] with a good
-measure of JetBrains API specifics. To convert the code for use on any JavaFx WebView project is
-a bit of an effort. The inner working of the debugger are very fragile and easy to make it
-core-dump right out of the application and any changes need to be thoroughly tested with a real
-debugger not a mock up.
+The current version is the the code I use in my [IntelliJ IDEA] plugin, [Markdown Navigator].
+With any functionality specific to my project added using the API of this library.
+
+I will be creating an example project based on Oracle's WebViewSample app with debugging
+implemented. It is easier to create and see a working example than to write a lot of words
+explaining how to do it. This will come later
 
 If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
 me and I will see if we can make this happen sooner than later. Knowing that someone needs this
@@ -65,8 +86,9 @@ will provide a little motivation to getting it done. A little motivation can go 
 #### In progress
 
 * highlighting of elements hovered over in the element tree of dev tools. Node resolution is
-  working. Kludged highlighting by setting a class on the element instead of using an overlay
-  element or the proper margin, borders, padding and container size.
+  working. Kludged highlighting by setting a class on the element with translucent background
+  color defined instead of using an overlay element or the proper margin, borders, padding and
+  container size.
 
 #### Not done
 
@@ -106,6 +128,7 @@ refresh.
 
 **The rest of this file is mostly a copy of one in [mohamnag/javafx_webview_debugger] project**
 with some changes to reflect being able to run multiple debugging sessions on a single server.
+It will be updated in the next few days.
 
 Using debugger is done in three main steps:
 
