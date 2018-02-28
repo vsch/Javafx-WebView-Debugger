@@ -9,11 +9,9 @@
         </parent>
     -->
 
-    <packaging>pom</packaging>
-
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
     <name>Javafx WebView Debugger</name>
     <description>
         Full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
