@@ -55,15 +55,12 @@ initialization debugging to allow pausing of the script before the JSBridge to J
 established. Having a real debugger makes minced meat of script initialization issues.
 
 The current version is the the code I use in my [IntelliJ IDEA] plugin, [Markdown Navigator].
-With any functionality specific to my project added using the API of this library.
+With any functionality specific to my project added using the API of this library. 
 
-I will be creating an example project based on Oracle's WebViewSample app with debugging
-implemented. It is easier to create and see a working example than to write a lot of words
-explaining how to do it. This will come later.
-
-If you are working with JavaFX WebView scripts and need this functionality ASAP, please contact
-me and I will see if we can make this happen sooner than later. Knowing that someone needs this
-will provide a little motivation to getting it done. A little motivation can go a long way.
+If you are working with JavaFX WebView scripts you need this functionality ASAP. Bugs that took
+hours to figure out now take literally seconds to minutes without any recompilation or major log
+reading. Take a look at the [Web View Debug Sample] application to see what you get and how to
+add it to your code.
 
 #### What is working
 
