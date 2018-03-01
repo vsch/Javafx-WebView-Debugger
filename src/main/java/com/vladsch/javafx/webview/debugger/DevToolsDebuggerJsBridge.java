@@ -25,19 +25,24 @@
 
 package com.vladsch.javafx.webview.debugger;
 
+import com.vladsch.boxed.json.*;
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
-import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.util.Map;
 import java.util.function.Consumer;
+
+import static com.vladsch.boxed.json.BoxedJson.isLiteral;
 
 public class DevToolsDebuggerJsBridge {
     protected static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
@@ -48,7 +53,7 @@ public class DevToolsDebuggerJsBridge {
     final @NotNull WebView myWebView;
     final @NotNull DevToolsDebugProxy myDebugger;
     @Nullable String myJSEventHandledBy;
-    @Nullable Element myState;
+    @Nullable BoxedJsObject myState;
 
     private final long myNanos = System.nanoTime();
     private final long myMilliNanos = System.currentTimeMillis() * 1000000;
@@ -64,9 +69,10 @@ public class DevToolsDebuggerJsBridge {
         myJfxScriptArgAccessor = new JfxScriptArgAccessorDelegate(new JfxScriptArgAccessorImpl());
         myJfxDebugProxyJsBridge = new JfxDebugProxyJsBridgeDelegate(new JfxDebugProxyJsBridgeImpl());
         myDebugger = new DevToolsDebugProxy(myWebView.getEngine().impl_getDebugger(), myJfxDebuggerAccess);
+        myState = null;
     }
 
-    @NotNull protected JfxDebugProxyJsBridge getJfxDebugProxyJsBridge() {
+    protected @NotNull JfxDebugProxyJsBridge getJfxDebugProxyJsBridge() {
         return myJfxDebugProxyJsBridge;
     }
 
@@ -161,8 +167,10 @@ public class DevToolsDebuggerJsBridge {
      * event listeners ignore the JavaScript event.stopPropagation() and event.preventDefault()
      * <p>
      * To use this properly clear this field after getting its value in the event listener.
+     *
+     * @return string passed by to {@link JfxDebugProxyJsBridge#setEventHandledBy(String)} by JavaScript
      */
-    @Nullable public String getJSEventHandledBy() {
+    public @Nullable String getJSEventHandledBy() {
         return myJSEventHandledBy;
     }
 
@@ -183,7 +191,7 @@ public class DevToolsDebuggerJsBridge {
      *
      * @return current state as set by java scripts
      */
-    @Nullable public Element getState() {
+    public @Nullable BoxedJsObject getState() {
         return myState;
     }
 
@@ -192,8 +200,8 @@ public class DevToolsDebuggerJsBridge {
      *
      * @param state last reported state
      */
-    public void setState(@Nullable final Element state) {
-        myState = state;
+    public void setState(@Nullable final JsonObject state) {
+        myState = BoxedJson.of(state);
     }
 
     /**
@@ -250,8 +258,7 @@ public class DevToolsDebuggerJsBridge {
         }
     }
 
-    @NotNull
-    public String getDebuggerURL() {
+    public @NotNull String getDebuggerURL() {
         return myDebuggerServer != null ? myDebuggerServer.getDebugUrl() : "";
     }
 
@@ -352,13 +359,12 @@ public class DevToolsDebuggerJsBridge {
     public void appendStateString(Appendable sb) {
         // output all the state vars
         if (myState != null) {
-            for (Element stateElem : myState.getChildren()) {
-                String value = stateElem.getAttributeValue("value");
-                try {
-                    sb.append("markdownNavigator.setState(\"").append(stateElem.getName()).append("\", ").append(value == null ? "null" : value).append(");\n");
-                } catch (IOException ignored) {
-
+            try {
+                for (Map.Entry<String, JsonValue> entry : myState.entrySet()) {
+                    sb.append("markdownNavigator.setState(\"").append(entry.getKey()).append("\", ").append(entry.getValue().toString()).append(");\n");
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -381,14 +387,12 @@ public class DevToolsDebuggerJsBridge {
 
     private class JfxScriptArgAccessorImpl implements JfxScriptArgAccessor {
         @Override
-        @Nullable
-        public Object getArg() {
+        public @Nullable Object getArg() {
             return myArg;
         }
 
         @Override
-        @Nullable
-        public Object getConsoleArg() {
+        public @Nullable Object getConsoleArg() {
             return myConsoleArg;
         }
     }
@@ -450,27 +454,12 @@ public class DevToolsDebuggerJsBridge {
         }
 
         @Override
-        @Nullable
-        public Object getState(final String name) {
+        public @Nullable Object getState(final String name) {
             // convert to JSObject
             if (myState != null) {
-                Element state = myState.getChild(name);
-                if (state != null) {
-                    String type = state.getAttributeValue("type");
-                    if (type == null) return null;
-                    String value = state.getAttributeValue("value");
-                    if (value == null) return null;
-
-                    switch (type) {
-                        case "JSON":
-                            // JSON, evaluate and return result
-                            return myWebView.getEngine().executeScript("(" + value + ")");
-                        case "String":
-                        case "Char":
-                            return value;
-                        default:
-                            return myWebView.getEngine().executeScript(value);
-                    }
+                BoxedJsValue state = myState.get(name);
+                if (state.isValid()) {
+                    return myWebView.getEngine().executeScript("(" + state.toString() + ")");
                 }
             }
             return null;
@@ -479,29 +468,28 @@ public class DevToolsDebuggerJsBridge {
         @Override
         public void setState(final @NotNull String name, final @Nullable Object state) {
             if (myState != null) {
-                Element stateElement = myState;
-
-                while (stateElement.removeAttribute(name)) ;
-                while (stateElement.removeChild(name)) ;
-
+                myState.remove(name);
                 if (state != null) {
                     // convert JSObject to Element others to attributes
                     try {
-                        if (state instanceof Integer || state instanceof Boolean || state instanceof Double || state instanceof Float || state instanceof Long || state instanceof Character || state instanceof String) {
-                            Element element = new Element(name);
-                            element.setAttribute("type", state.getClass().getSimpleName());
-                            element.setAttribute("value", state.toString());
-                            stateElement.addContent(element);
-                        } else if (state instanceof JSObject) {
+                        JsonValue value = null;
+                        if (state instanceof Integer) value = BoxedJson.boxedOf((int) state);
+                        else if (state instanceof Boolean) value = BoxedJson.boxedOf((boolean) state);
+                        else if (state instanceof Double) value = BoxedJson.boxedOf((double) state);
+                        else if (state instanceof Float) value = BoxedJson.boxedOf((float) state);
+                        else if (state instanceof Long) value = BoxedJson.boxedOf((long) state);
+                        else if (state instanceof Character) value = BoxedJson.boxedOf(String.valueOf((char) state));
+                        else if (state instanceof String) value = BoxedJson.boxedOf((String) state);
+                        else if (state instanceof JSObject) {
                             // need to convert to JSON string
                             myArg = state;
                             String jsonString = (String) myWebView.getEngine().executeScript("JSON.stringify(window.__MarkdownNavigatorArgs.getArg(), null, 0)");
                             myArg = null;
 
-                            Element element = new Element(name);
-                            element.setAttribute("type", "JSON");
-                            element.setAttribute("value", jsonString);
-                            stateElement.addContent(element);
+                            value = BoxedJson.boxedFrom(jsonString);
+                        }
+                        if (value != null) {
+                            myState.put(name, value);
                         }
                     } catch (Throwable e) {
                         LOG.error(e);

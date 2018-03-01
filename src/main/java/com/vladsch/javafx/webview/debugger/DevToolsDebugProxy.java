@@ -15,7 +15,6 @@
 
 package com.vladsch.javafx.webview.debugger;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.scene.web.Debugger;
 import com.vladsch.boxed.json.*;
