@@ -12,7 +12,7 @@
 
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.5.4</version>
+    <version>0.5.6</version>
     <name>Javafx WebView Debugger</name>
     <description>
         Full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
@@ -190,14 +190,14 @@
         <dependency>
             <groupId>com.vladsch.boxed-json</groupId>
             <artifactId>boxed-json</artifactId>
-            <version>0.5.4</version>
+            <version>0.5.6</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>LATEST</version>
+            <version>15.0</version>
         </dependency>
 
         <dependency>

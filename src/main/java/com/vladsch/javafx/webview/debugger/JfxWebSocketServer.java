@@ -80,7 +80,7 @@ public class JfxWebSocketServer extends WebSocketServer {
     }
 
     public void addServer(JfxDebuggerConnector debugServer, int instanceID) {
-        String resourceId = String.format(WEB_SOCKET_RESOURCE, instanceID);
+        String resourceId = instanceID == 0 ? "/" : String.format(WEB_SOCKET_RESOURCE, instanceID);
         if (myServers.containsKey(resourceId)) {
             throw new IllegalStateException("Resource id " + resourceId + " is already handled by " + myServers.get(resourceId));
         }

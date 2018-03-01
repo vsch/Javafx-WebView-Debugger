@@ -28,12 +28,12 @@ package com.vladsch.javafx.webview.debugger;
 import com.vladsch.boxed.json.*;
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
+import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.json.JsonObject;
 import javax.json.JsonValue;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +41,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.function.Consumer;
-
-import static com.vladsch.boxed.json.BoxedJson.isLiteral;
 
 public class DevToolsDebuggerJsBridge {
     protected static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
@@ -52,8 +50,8 @@ public class DevToolsDebuggerJsBridge {
     final @NotNull JfxDebugProxyJsBridge myJfxDebugProxyJsBridge;
     final @NotNull WebView myWebView;
     final @NotNull DevToolsDebugProxy myDebugger;
+    final @Nullable JfxScriptStateProvider myStateProvider;
     @Nullable String myJSEventHandledBy;
-    @Nullable BoxedJsObject myState;
 
     private final long myNanos = System.nanoTime();
     private final long myMilliNanos = System.currentTimeMillis() * 1000000;
@@ -62,14 +60,14 @@ public class DevToolsDebuggerJsBridge {
     @Nullable DevToolsDebuggerServer myDebuggerServer;
     final int myInstance;
 
-    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, int instance) {
+    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, int instance, @Nullable JfxScriptStateProvider stateProvider) {
         myWebView = webView;
         myInstance = instance;
+        myStateProvider = stateProvider;
         myJfxDebuggerAccess = new JfxDebuggerAccessImpl();
         myJfxScriptArgAccessor = new JfxScriptArgAccessorDelegate(new JfxScriptArgAccessorImpl());
         myJfxDebugProxyJsBridge = new JfxDebugProxyJsBridgeDelegate(new JfxDebugProxyJsBridgeImpl());
         myDebugger = new DevToolsDebugProxy(myWebView.getEngine().impl_getDebugger(), myJfxDebuggerAccess);
-        myState = null;
     }
 
     protected @NotNull JfxDebugProxyJsBridge getJfxDebugProxyJsBridge() {
@@ -98,11 +96,15 @@ public class DevToolsDebuggerJsBridge {
      * This means after either the {@link #pageReloading()} is called or {@link #pageReloadStarted()}
      * is invoked to inform of page reloading operation.
      */
-    public void injectJsBridge() {
+    public void connectJsBridge() {
         JSObject jsObject = (JSObject) myWebView.getEngine().executeScript("window");
         jsObject.setMember("__MarkdownNavigatorArgs", myJfxScriptArgAccessor); // this interface stays for the duration, does not give much
         jsObject.setMember("__MarkdownNavigator", getJfxDebugProxyJsBridge()); // this interface is captured by the helper script since incorrect use can bring down the whole app
-        myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+        try {
+            myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+        } catch (JSException ignored) {
+
+        }
         jsObject.removeMember("__MarkdownNavigator");
     }
 
@@ -113,8 +115,19 @@ public class DevToolsDebuggerJsBridge {
      *
      * @return input stream
      */
-    protected InputStream getJsBridgeHelperAsStream() {
+    public InputStream getJsBridgeHelperAsStream() {
         return DevToolsDebuggerJsBridge.class.getResourceAsStream("/markdown-navigator.js");
+    }
+
+    /**
+     * InputStream for the JSBridge Helper script to inject during page loading
+     * <p>
+     * Override if you want to customize the jsBridge helper script
+     *
+     * @return input stream
+     */
+    public String getJsBridgeHelperURL() {
+        return String.valueOf(DevToolsDebuggerJsBridge.class.getResource("/markdown-navigator.js"));
     }
 
     /**
@@ -184,24 +197,6 @@ public class DevToolsDebuggerJsBridge {
      */
     public void clearJSEventHandledBy() {
         myJSEventHandledBy = null;
-    }
-
-    /**
-     * Used to implement persistent state access to JavaScripts.
-     *
-     * @return current state as set by java scripts
-     */
-    public @Nullable BoxedJsObject getState() {
-        return myState;
-    }
-
-    /**
-     * Used to set the previously reported state as it was set by scripts
-     *
-     * @param state last reported state
-     */
-    public void setState(@Nullable final JsonObject state) {
-        myState = BoxedJson.of(state);
     }
 
     /**
@@ -299,24 +294,29 @@ public class DevToolsDebuggerJsBridge {
      * Interface implementation for proxy to get access and do callbacks
      */
     private class JfxDebuggerAccessImpl implements JfxDebuggerAccess {
-        @Override public String setArg(final Object arg) {
+        @Override
+        public String setArg(final Object arg) {
             myConsoleArg = arg;
             return "window.__MarkdownNavigatorArgs.getConsoleArg()";
         }
 
-        @Override public void clearArg() {
+        @Override
+        public void clearArg() {
             myConsoleArg = null;
         }
 
-        @Override public Object eval(final String script) {
+        @Override
+        public Object eval(final String script) {
             return myWebView.getEngine().executeScript(script);
         }
 
-        @Override public void pageReloadStarted() {
+        @Override
+        public void pageReloadStarted() {
             DevToolsDebuggerJsBridge.this.pageReloadStarted();
         }
 
-        @Override public String jsBridgeHelperScript() {
+        @Override
+        public String jsBridgeHelperScript() {
             StringWriter writer = new StringWriter();
             InputStream inputStream = getJsBridgeHelperAsStream();
             InputStreamReader reader = new InputStreamReader(inputStream);
@@ -358,9 +358,9 @@ public class DevToolsDebuggerJsBridge {
      */
     public void appendStateString(Appendable sb) {
         // output all the state vars
-        if (myState != null) {
+        if (myStateProvider != null) {
             try {
-                for (Map.Entry<String, JsonValue> entry : myState.entrySet()) {
+                for (Map.Entry<String, JsonValue> entry : myStateProvider.getState().entrySet()) {
                     sb.append("markdownNavigator.setState(\"").append(entry.getKey()).append("\", ").append(entry.getValue().toString()).append(");\n");
                 }
             } catch (IOException e) {
@@ -456,8 +456,8 @@ public class DevToolsDebuggerJsBridge {
         @Override
         public @Nullable Object getState(final String name) {
             // convert to JSObject
-            if (myState != null) {
-                BoxedJsValue state = myState.get(name);
+            if (myStateProvider != null) {
+                BoxedJsValue state = myStateProvider.getState().get(name);
                 if (state.isValid()) {
                     return myWebView.getEngine().executeScript("(" + state.toString() + ")");
                 }
@@ -467,8 +467,10 @@ public class DevToolsDebuggerJsBridge {
 
         @Override
         public void setState(final @NotNull String name, final @Nullable Object state) {
-            if (myState != null) {
-                myState.remove(name);
+            if (myStateProvider != null) {
+                BoxedJsObject scriptState = myStateProvider.getState();
+                scriptState.remove(name);
+
                 if (state != null) {
                     // convert JSObject to Element others to attributes
                     try {
@@ -489,12 +491,15 @@ public class DevToolsDebuggerJsBridge {
                             value = BoxedJson.boxedFrom(jsonString);
                         }
                         if (value != null) {
-                            myState.put(name, value);
+                            scriptState.put(name, value);
                         }
                     } catch (Throwable e) {
                         LOG.error(e);
                     }
                 }
+
+                // strictly a formality since the state is mutable, but lets provider save/cache or whatever else
+                myStateProvider.setState(scriptState);
             }
         }
 

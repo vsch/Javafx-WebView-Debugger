@@ -1,4 +1,5 @@
 # JavaFX WebView Debugger 
+
 ##### Via WebSocket connection to Google Chrome Dev Tools
 
 [![Build status](https://travis-ci.org/vsch/Javafx-WebView-Debugger.svg?branch=master)](https://travis-ci.org/vsch/Javafx-WebView-Debugger)
@@ -9,8 +10,11 @@ logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
 
-
 ### Quick Start
+
+Take a look at the [Web View Debug Sample] application for a working example. You can play with
+it and debug the embedded scripts before deciding whether you want to instrument your own
+application for Chrome Dev Tools debugging.
 
 For Maven:
 
@@ -18,17 +22,15 @@ For Maven:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>LATEST</version>
+    <version>0.5.6</version>
 </dependency>
 ```
-
-A WebViewSample application modified for debugging will be added shortly.
 
 #### Credit where credit is due
 
 I found out about the possibility of having any debugger for JavaFX WebView in
 [mohamnag/javafx_webview_debugger]. That implementation in turn was based on the solution found
-by Bosko Popovic. 
+by Bosko Popovic.
 
 I am grateful to Bosko Popovic for discovering the availability and to Mohammad Naghavi creating
 an implementation of the solution. Without their original effort this solution would not be
@@ -127,24 +129,16 @@ persisted state then the unmodified version will flash on screen before the scri
 Allowing scripts to get their state before `JSBridge` is established makes for smoother page
 refresh.
 
-**The rest of this file is mostly a copy of one in [mohamnag/javafx_webview_debugger] project**
-with some changes to reflect being able to run multiple debugging sessions on a single server.
-It will be updated in the next few days.
+### Getting Full Featured Debugging 
 
-Using debugger is done in three main steps:
+This requires a little support from the Java to JavaScript bridge and the debug proxy. See the
+[Web View Debug Sample] application for an example.
 
-1. Starting debug server
-2. Connecting chrome debugger
-3. Clean up
+I have not tried it with Java 9, and suspect that the debug protocol has changed and the proxy
+may not work with it without modifications.
 
-### Starting debug server
-
-If you are using Java up to version 8, to enable debugging on a chosen WebView, you have to add
-following code using its `webEngine`:
-
-```java
-DevToolsDebuggerServer devToolsDebuggerServer(webEngine.impl_getDebugger(), 51742, 1);
-```
+However, these are the instructions to compile for Java 9 WebView debugger access as given by
+[mohamnag/javafx_webview_debugger].
 
 `WebEngine.impl_getDebugger()` is an internal API and is subject to change which is happened in
 Java 9. So if you are using Java 9, you need to use following code instead to start the debug
@@ -184,153 +178,10 @@ As examples, this can be done for Maven as follows:
 or for IntelliJ under **Additional command line parameters** in **Preferences > Build,
 Execution, Deployment > Compiler > Java Compiler**.
 
-### Connecting chrome debugger
-
-Then you only need to open following URL in a chrome browser:
-
-```
-chrome-devtools://devtools/bundled/inspector.html?ws=localhost:51742/?1
-```
-
-Where 1, 2, 3, ... is the session number you passed to the `DevToolsDebuggerServer` constructor
-and 51742 is the port passed to the debug server.
-
-**NOTE**: since the web-socket server is a shared static instance, all sessions will have to use
-the same port number.
-
-### Clean up
-
-For a proper shutdown you have to call following when exiting a session or turning off debugging
-for it:
-
-```java
-devToolsDebuggerServer.stopDebugServer();
-```
-
-This will disconnect the JavaFX WebView debugger from its session and this instance of
-`DevToolsDebuggerServer` will no longer be usable for debugging. To re-start debugging on the
-same session number, create a new instance.
-
-To shut down the web-socket server after all sessions have been stopped call:
-
-```java
-DevToolsDebuggerServer.shutdownWebSocketServer();
-```
-
-## No Library Installation
-
-Code is too small and will most likely need to be customized for your project. Add the two small
-files to your project and modify to your needs. Add [TooTallNate/Java-WebSocket] as a
-dependency.
-
-These files were pulled from a project after I got it all working nicely. Removed IntelliJ API
-related code and put them here so they can be of use to others.
-
-<!-- 
-### Maven
-
-To use maven add this dependency to your pom.xml:
-
-```
-<dependency>
-  <groupId>org.java-websocket</groupId>
-  <artifactId>Java-WebSocket</artifactId>
-  <version>1.3.7</version>
-</dependency>
-```
-
-### Gradle
-
-To use Gradle add the maven central repository to your repositories list :
-
-```
-mavenCentral()
-```
-
-Then you can just add the latest version to your build.
-
-```
-compile "org.java-websocket:Java-WebSocket:1.3.7"
-```
- -->
-
-JetBrains IntelliJ project files included if you need to reference them, Library is configured
-and downloaded into `lib/`
-
-## Enabling the console
-
-JavaFX WebView does not have a console defined, so console calls inside JavaScript are not
-possible by default. In order to enable JavaScript logging inside JavaFX, a bridge class and a
-separate listener for JavaScript are required.
-
-#### Bridge class
-
-```java
-public class JavaBridge {
-
-    public void log(String text) {
-        System.out.println(text);
-    }
-
-    public void error(String text) {
-        System.err.println(text);
-    }
-}
-```
-
-It is recommended to use `System.out.println` for writing to console and avoid any custom
-loggers, as they can cause the entire method to be undefined.
-
-#### Code inside Main class
-
-```java
-webEngine.setJavaScriptEnabled(true);
-
-webEngine.getLoadWorker().stateProperty().addListener( new ChangeListener<State>() {
-    @Override
-    public void changed(ObservableValue ov, State oldState, State newState) {
-        if (newState == Worker.State.SUCCEEDED) {
-            JSObject window = (JSObject) webEngine.executeScript("window");
-            JavaBridge javaBridge = new JavaBridge();
-            window.setMember("console", javaBridge); // "console" object is now known to JavaScript
-        }
-    }
-});
-
-```
-
-Note that the name *console* in `window.setMember` can be arbitrary, but it is recommended to
-override the console instead because many JavaScript APIs make hidden calls to the console.
-Since the console is undefined by default, JavaScript will most likely stop working after that
-point.
-
-#### JavaScript example
-
-```javascript
-function initializeMap() {
-
-    var moscowLonLat = \[37.618423, 55.751244\];
-
-    map = new ol.Map({
-        target: 'map',
-        view: new ol.View({
-            center: ol.proj.fromLonLat(moscowLonLat),
-            zoom: 14
-        })
-    });
-    mapLayer = new ol.layer.Tile({
-        source: new ol.source.OSM()
-    });
-
-    map.addLayer(mapLayer);
-
-    console.log("Map initialized!"); // This will appear in the JavaFX console
-}
-```
-
 [IntelliJ IDEA]: http://www.jetbrains.com/idea
-[Kotlin]: http://kotlinlang.org
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [mohamnag/javafx_webview_debugger]: https://github.com/mohamnag/javafx_webview_debugger
+[Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
+[Kotlin]: http://kotlinlang.org
 [TooTallNate/Java-WebSocket]: https://github.com/TooTallNate/Java-WebSocket
 
