@@ -10,6 +10,16 @@ logging from scripts, with caller location for one click navigation to source:
 
 ![DevTools](images/DevTools.png)
 
+### Requirements
+
+* Java 8 (not tested with 9)
+* The project is on Maven: `com.vladsch.javafx-webview-debugger`
+* dependencies:
+  * `org.glassfish:javax.json`
+  * `org.jetbrains.annotations`
+  * `com.vladsch.boxed-json`
+  * `org.apache.log4j`
+
 ### Quick Start
 
 Take a look at the [Web View Debug Sample] application for a working example. You can play with
@@ -26,7 +36,7 @@ For Maven:
 </dependency>
 ```
 
-#### Credit where credit is due
+### Credit where credit is due
 
 I found out about the possibility of having any debugger for JavaFX WebView in
 [mohamnag/javafx_webview_debugger]. That implementation in turn was based on the solution found
@@ -55,7 +65,7 @@ initialization debugging to allow pausing of the script before the JSBridge to J
 established. Having a real debugger makes minced meat of script initialization issues.
 
 The current version is the the code I use in my [IntelliJ IDEA] plugin, [Markdown Navigator].
-With any functionality specific to my project added using the API of this library. 
+With any functionality specific to my project added using the API of this library.
 
 If you are working with JavaFX WebView scripts you need this functionality ASAP. Bugs that took
 hours to figure out now take literally seconds to minutes without any recompilation or major log
@@ -179,6 +189,9 @@ Execution, Deployment > Compiler > Java Compiler**.
 [Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
 [mohamnag/javafx_webview_debugger]: https://github.com/mohamnag/javafx_webview_debugger
 [Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
+[Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
+[JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
 [Kotlin]: http://kotlinlang.org
 [TooTallNate/Java-WebSocket]: https://github.com/TooTallNate/Java-WebSocket
+[WebViewDebugSample.jar]: https://github.com/vsch/WebViewDebugSample/raw/master/WebViewDebugSample.jar
 

@@ -21,4 +21,6 @@ public interface JfxDebuggerAccess {
     Object eval(String script);
     void pageReloadStarted();
     String jsBridgeHelperScript();
+    void onConnectionOpen();
+    void onConnectionClosed();
 }

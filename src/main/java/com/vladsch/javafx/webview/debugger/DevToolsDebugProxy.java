@@ -136,7 +136,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         myJfxDebuggerAccess.clearArg();
     }
 
-    @Override public boolean isDebuggerPaused() {
+    @Override
+    public boolean isDebuggerPaused() {
         return myDebuggerIsPaused.get();
     }
 
@@ -144,7 +145,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         if (LOG.isDebugEnabled()) System.out.println(message);
     }
 
-    @Override public void releaseDebugger(final boolean shuttingDown, @Nullable Runnable runnable) {
+    @Override
+    public void releaseDebugger(final boolean shuttingDown, @Nullable Runnable runnable) {
         if (!myIsEnabled) return;
 
         myIsShuttingDown = shuttingDown;
@@ -180,13 +182,16 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     @Override
     public void onOpen() {
         myIsShuttingDown = false;
+        Platform.runLater(myJfxDebuggerAccess::onConnectionOpen);
     }
 
-    @Override public void setDebugOnLoad(final DebugOnLoad debugOnLoad) {
+    @Override
+    public void setDebugOnLoad(final DebugOnLoad debugOnLoad) {
         myDebugOnLoad = debugOnLoad;
     }
 
-    @Override public DebugOnLoad getDebugOnLoad() {
+    @Override
+    public DebugOnLoad getDebugOnLoad() {
         return myDebugOnLoad;
     }
 
@@ -203,6 +208,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                 clearOnPageReload();
             });
         });
+
+        Platform.runLater(myJfxDebuggerAccess::onConnectionClosed);
     }
 
     @Override
@@ -233,14 +240,16 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         });
     }
 
-    @Override public void pageReloading() {
+    @Override
+    public void pageReloading() {
         if (!myIsEnabled) return;
 
         mySuppressPageReloadRequest = true;
         myPageReloadStarted = true;
     }
 
-    @Override public void reloadPage() {
+    @Override
+    public void reloadPage() {
         if (!myIsEnabled) return;
 
         // send page reload so it can be debugged, does not work
@@ -254,7 +263,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         }
     }
 
-    @Override public void pageLoadComplete() {
+    @Override
+    public void pageLoadComplete() {
         myPageReloadStarted = false;
     }
 
@@ -360,7 +370,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         debuggerSend(String.format("{\"id\":%d,\"method\":\"Debugger.pause\"}", debuggerId), EMPTY_EVAL_SCRIPT);
     }
 
-    @Override public void debugBreak() {
+    @Override
+    public void debugBreak() {
         if (!myIsEnabled || myIsShuttingDown) return;
 
         debugBreak(null);

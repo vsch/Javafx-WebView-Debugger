@@ -286,14 +286,34 @@ public class DevToolsDebuggerJsBridge {
             myDebuggerServer.setDebugOnLoad(debugBreakInjectionOnLoad ? JfxDebuggerProxy.DebugOnLoad.ON_INJECT_HELPER : JfxDebuggerProxy.DebugOnLoad.ON_BRIDGE_CONNECT);
             myDebuggerServer.reloadPage();
         } else {
-            myWebView.getEngine().reload();
+            Platform.runLater(() -> {
+                myWebView.getEngine().reload();
+            });
         }
+    }
+
+    public void onConnectionOpen() {
+
+    }
+
+    public void onConnectionClosed() {
+
     }
 
     /**
      * Interface implementation for proxy to get access and do callbacks
      */
     private class JfxDebuggerAccessImpl implements JfxDebuggerAccess {
+        @Override
+        public void onConnectionOpen() {
+            DevToolsDebuggerJsBridge.this.onConnectionOpen();
+        }
+
+        @Override
+        public void onConnectionClosed() {
+            DevToolsDebuggerJsBridge.this.onConnectionClosed();
+        }
+
         @Override
         public String setArg(final Object arg) {
             myConsoleArg = arg;
