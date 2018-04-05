@@ -12,7 +12,7 @@
 
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.5.8</version>
+    <version>0.5.10</version>
     <name>Javafx WebView Debugger</name>
     <description>
         Full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.vladsch.boxed-json</groupId>
             <artifactId>boxed-json</artifactId>
-            <version>0.5.8</version>
+            <version>0.5.10</version>
         </dependency>
 
         <dependency>
