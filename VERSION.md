@@ -3,9 +3,20 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.5.12](#0512)
+- [0.5.10](#0510)
 - [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.5.12
+
+* Fix: dev tools console commands were not properly converted from JSON to strings, and did not
+  unescape the `\"` causing exception during eval.
+
+### 0.5.10
+
+* boxed-json fix incorporated.
 
 ### 0.5.8
 

@@ -1064,8 +1064,8 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
                         final String evalExpression;
                         if (jsIncludeConsoleAPI.isTrue()) {
-                            String expression = jsEvalExpression.toString();
-                            evalExpression = String.format("with (__api) { %s }", expression.length() > 1 ? expression.substring(1, expression.length() - 1) : expression);
+                            String expression = jsEvalExpression.getString();
+                            evalExpression = String.format("with (__api) { %s }", expression);
                         } else {
                             evalExpression = jsEvalExpression.getString();
                         }
