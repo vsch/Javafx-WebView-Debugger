@@ -1,4 +1,4 @@
-# JavaFX WebView Debugger 
+# JavaFX WebView Debugger
 
 ##### Via WebSocket connection to Google Chrome Dev Tools
 
@@ -32,7 +32,7 @@ For Maven:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.5.6</version>
+    <version>0.5.12</version>
 </dependency>
 ```
 
@@ -108,7 +108,7 @@ add it to your code.
 
 * profiling not available. Don't know enough about what's needed to say whether it is doable.
 
-### JSBridge Provided Debugging Support  
+### JSBridge Provided Debugging Support
 
 The missing functionality from the WebView debugger is implemented via a proxy that gets between
 chrome dev tools and the debugger to fill in the blanks and to massage the conversation allowing
@@ -136,7 +136,7 @@ persisted state then the unmodified version will flash on screen before the scri
 Allowing scripts to get their state before `JSBridge` is established makes for smoother page
 refresh.
 
-### Getting Full Featured Debugging 
+### Getting Full Featured Debugging
 
 This requires a little support from the Java to JavaScript bridge and the debug proxy. See the
 [Web View Debug Sample] application for an example.
@@ -186,7 +186,7 @@ or for IntelliJ under **Additional command line parameters** in **Preferences > 
 Execution, Deployment > Compiler > Java Compiler**.
 
 [IntelliJ IDEA]: http://www.jetbrains.com/idea
-[Markdown Navigator]: http://vladsch.com/product/markdown-navigator 
+[Markdown Navigator]: http://vladsch.com/product/markdown-navigator
 [mohamnag/javafx_webview_debugger]: https://github.com/mohamnag/javafx_webview_debugger
 [Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
 [Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
