@@ -60,6 +60,7 @@ public class DevToolsDebuggerJsBridge {
     @Nullable DevToolsDebuggerServer myDebuggerServer;
     final int myInstance;
 
+    @SuppressWarnings("deprecation")
     public DevToolsDebuggerJsBridge(@NotNull final WebView webView, int instance, @Nullable JfxScriptStateProvider stateProvider) {
         myWebView = webView;
         myInstance = instance;
