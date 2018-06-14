@@ -511,7 +511,7 @@ public class DevToolsDebuggerJsBridge {
 
                             value = BoxedJson.boxedFrom(jsonString);
                         }
-                        if (value != null) {
+                        if (value != null && ((BoxedJsValue) value).isValid()) {
                             scriptState.put(name, value);
                         }
                     } catch (Throwable e) {
