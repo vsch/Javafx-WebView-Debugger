@@ -32,7 +32,7 @@ For Maven:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.5.12</version>
+    <version>0.6.0</version>
 </dependency>
 ```
 
@@ -158,7 +158,7 @@ Field debuggerField = webEngineClazz.getDeclaredField("debugger");
 debuggerField.setAccessible(true);
 
 Debugger debugger = (Debugger) debuggerField.get(webView.getEngine());
-DevToolsDebuggerServer devToolsDebuggerServer.startDebugServer(debugger, 51742, 1);
+DevToolsDebuggerServer devToolsDebuggerServer.startDebugServer(debugger, WEBVIEW_DEBUG_PORT, 0, null, null);
 ```
 
 For this to work, you have to pass this parameter to Java compiler: `--add-exports

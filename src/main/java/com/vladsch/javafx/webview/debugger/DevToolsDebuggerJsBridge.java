@@ -25,6 +25,7 @@
 
 package com.vladsch.javafx.webview.debugger;
 
+import com.sun.javafx.scene.web.Debugger;
 import com.vladsch.boxed.json.*;
 import javafx.application.Platform;
 import javafx.scene.web.WebView;
@@ -61,14 +62,14 @@ public class DevToolsDebuggerJsBridge {
     final int myInstance;
 
     @SuppressWarnings("deprecation")
-    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, int instance, @Nullable JfxScriptStateProvider stateProvider) {
+    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final Debugger debugger, int instance, @Nullable JfxScriptStateProvider stateProvider) {
         myWebView = webView;
         myInstance = instance;
         myStateProvider = stateProvider;
         myJfxDebuggerAccess = new JfxDebuggerAccessImpl();
         myJfxScriptArgAccessor = new JfxScriptArgAccessorDelegate(new JfxScriptArgAccessorImpl());
         myJfxDebugProxyJsBridge = new JfxDebugProxyJsBridgeDelegate(new JfxDebugProxyJsBridgeImpl());
-        myDebugger = new DevToolsDebugProxy(myWebView.getEngine().impl_getDebugger(), myJfxDebuggerAccess);
+        myDebugger = new DevToolsDebugProxy(debugger, myJfxDebuggerAccess);
     }
 
     protected @NotNull JfxDebugProxyJsBridge getJfxDebugProxyJsBridge() {
