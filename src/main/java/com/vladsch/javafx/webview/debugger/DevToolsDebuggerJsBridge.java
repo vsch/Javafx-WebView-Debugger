@@ -104,8 +104,8 @@ public class DevToolsDebuggerJsBridge {
         jsObject.setMember("__MarkdownNavigator", getJfxDebugProxyJsBridge()); // this interface is captured by the helper script since incorrect use can bring down the whole app
         try {
             myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
-        } catch (JSException ignored) {
-
+        } catch (JSException e) {
+            LOG.error("jsBridgeHelperScript: exception", e);
         }
         jsObject.removeMember("__MarkdownNavigator");
     }
@@ -353,8 +353,8 @@ public class DevToolsDebuggerJsBridge {
                 }
                 reader.close();
                 inputStream.close();
-            } catch (IOException ignored) {
-
+            } catch (IOException e) {
+                LOG.error("jsBridgeHelperScript: exception", e);
             }
 
             DevToolsDebuggerJsBridge.this.jsBridgeHelperScriptSuffix(writer);
@@ -386,7 +386,7 @@ public class DevToolsDebuggerJsBridge {
                     sb.append("markdownNavigator.setState(\"").append(entry.getKey()).append("\", ").append(entry.getValue().toString()).append(");\n");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("appendStateString: exception", e);
             }
         }
     }
