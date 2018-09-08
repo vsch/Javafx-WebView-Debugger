@@ -105,7 +105,8 @@ public class DevToolsDebuggerJsBridge {
         try {
             myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
         } catch (JSException e) {
-            LOG.error("jsBridgeHelperScript: exception", e);
+            e.printStackTrace();
+            LOG.warn("jsBridgeHelperScript: exception", e);
         }
         jsObject.removeMember("__MarkdownNavigator");
     }
@@ -343,6 +344,8 @@ public class DevToolsDebuggerJsBridge {
             InputStream inputStream = getJsBridgeHelperAsStream();
             InputStreamReader reader = new InputStreamReader(inputStream);
 
+            writer.append("var markdownNavigator;");
+
             DevToolsDebuggerJsBridge.this.jsBridgeHelperScriptPrefix(writer);
 
             try {
@@ -363,7 +366,6 @@ public class DevToolsDebuggerJsBridge {
             //writer.append('\n')
             //writer.append("console.log(\"markdownNavigator: %cInjected\", \"color: #bb002f\");")
 
-            writer.append("var markdownNavigator;");
             appendStateString(writer);
             return writer.toString();
         }
