@@ -5,6 +5,11 @@
 [![Build status](https://travis-ci.org/vsch/Javafx-WebView-Debugger.svg?branch=master)](https://travis-ci.org/vsch/Javafx-WebView-Debugger)
 [![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/javafx-webview-debugger.svg)](https://search.maven.org/search?q=g:com.vladsch.javafx-webview-debugger)
 
+Debugger is highly dependent on Google Chrome version. I got this working with Chrome version
+65.0.3325.181 under OS X. Later versions work but console has no output. I have not investigated
+what is causing this. You can download older Chrome versions from
+**[Google Chrome Older Versions Download (Windows, Linux & Mac)](https://www.slimjet.com/chrome/google-chrome-old-version.php)**
+
 Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console
 logging from scripts, with caller location for one click navigation to source:
 
