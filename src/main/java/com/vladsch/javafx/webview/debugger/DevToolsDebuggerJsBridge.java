@@ -103,7 +103,7 @@ public class DevToolsDebuggerJsBridge {
         jsObject.setMember("__MarkdownNavigatorArgs", myJfxScriptArgAccessor); // this interface stays for the duration, does not give much
         jsObject.setMember("__MarkdownNavigator", getJfxDebugProxyJsBridge()); // this interface is captured by the helper script since incorrect use can bring down the whole app
         try {
-            myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+            myWebView.getEngine().executeScript("var markdownNavigator; markdownNavigator && markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
         } catch (JSException e) {
             e.printStackTrace();
             LOG.warn("jsBridgeHelperScript: exception", e);
