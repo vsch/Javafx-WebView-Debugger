@@ -5,9 +5,20 @@
 [![Build status](https://travis-ci.org/vsch/Javafx-WebView-Debugger.svg?branch=master)](https://travis-ci.org/vsch/Javafx-WebView-Debugger)
 [![Maven Central status](https://img.shields.io/maven-central/v/com.vladsch.javafx-webview-debugger/javafx-webview-debugger.svg)](https://search.maven.org/search?q=g:com.vladsch.javafx-webview-debugger)
 
-Debugger is highly dependent on Google Chrome version. I got this working with Chrome version
-65.0.3325.181 under OS X. Later versions work but console has no output. I have not investigated
-what is causing this. You can download older Chrome versions from
+JavaFx WebView debugging with Chrome Dev tools is highly dependent on Google Chrome version and
+JavaFx Version.
+
+If you can debug your scripts using another environment, I would highly recommend doing that instead.
+Only use JavaFx WebView based debugging when you absolutely need to debug the code under this
+environment.
+
+JavaFx I use for debugging is JetBrains OpenJDK 1.8.0u152 build 1136 which I found to be the
+most stable for JavaFx WebView debugging. Other versions are more quirky and after starting
+debug server they need a page reload from the context menu before connecting Chrome Dev Tools.
+Otherwise, JavaFX crashes and takes the application with it.
+
+I use Chrome version 65.0.3325.181 under OS X. Later versions work but console has no output. I
+have not investigated what is causing this. You can download older Chrome versions from
 **[Google Chrome Older Versions Download (Windows, Linux & Mac)](https://www.slimjet.com/chrome/google-chrome-old-version.php)**
 
 Here is a teaser screenshot of dev tools running with JavaFX WebView, showing off the console

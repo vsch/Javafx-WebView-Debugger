@@ -34,7 +34,7 @@ var debugBreak = () => {
 
 // lets keep this around for our scripts
 // noinspection ES6ConvertVarToLetConst
-var __api = console.__commandLineAPI;
+var __api = console.__commandLineAPI || {};
 
 // map console functions to our bridge
 // noinspection ES6ConvertVarToLetConst
