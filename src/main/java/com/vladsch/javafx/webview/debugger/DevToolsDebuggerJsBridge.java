@@ -60,9 +60,14 @@ public class DevToolsDebuggerJsBridge {
     @Nullable Object myArg = null;
     @Nullable DevToolsDebuggerServer myDebuggerServer;
     final int myInstance;
+    final boolean mySuppressNoMarkdownException;
 
     @SuppressWarnings("deprecation")
     public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final Debugger debugger, int instance, @Nullable JfxScriptStateProvider stateProvider) {
+        this(webView, debugger, instance, stateProvider, false);
+    }
+
+    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final Debugger debugger, int instance, @Nullable JfxScriptStateProvider stateProvider, boolean suppressNoMarkdownException) {
         myWebView = webView;
         myInstance = instance;
         myStateProvider = stateProvider;
@@ -70,6 +75,7 @@ public class DevToolsDebuggerJsBridge {
         myJfxScriptArgAccessor = new JfxScriptArgAccessorDelegate(new JfxScriptArgAccessorImpl());
         myJfxDebugProxyJsBridge = new JfxDebugProxyJsBridgeDelegate(new JfxDebugProxyJsBridgeImpl());
         myDebugger = new DevToolsDebugProxy(debugger, myJfxDebuggerAccess);
+        mySuppressNoMarkdownException = suppressNoMarkdownException;
     }
 
     protected @NotNull JfxDebugProxyJsBridge getJfxDebugProxyJsBridge() {
@@ -103,7 +109,12 @@ public class DevToolsDebuggerJsBridge {
         jsObject.setMember("__MarkdownNavigatorArgs", myJfxScriptArgAccessor); // this interface stays for the duration, does not give much
         jsObject.setMember("__MarkdownNavigator", getJfxDebugProxyJsBridge()); // this interface is captured by the helper script since incorrect use can bring down the whole app
         try {
-            myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+            if (mySuppressNoMarkdownException) {
+                myWebView.getEngine().executeScript("var markdownNavigator; markdownNavigator && markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+
+            } else {
+                myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
+            }
         } catch (JSException e) {
             e.printStackTrace();
             LOG.warn("jsBridgeHelperScript: exception", e);

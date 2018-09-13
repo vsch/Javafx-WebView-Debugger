@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ScappleDocument Version="1.1" ID="9DC7E889-AB86-4059-B1EE-512B9897B2B7">
+    <Notes>
+        <Note ID="0" FontSize="12.0" Position="23.335938,24.445312" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1"></Border>
+            </Appearance>
+            <String>JavaFX WebView Content Load</String>
+            <ConnectedNoteIDs>1, 11</ConnectedNoteIDs>
+            <PointsToNoteIDs>1</PointsToNoteIDs>
+        </Note>
+        <Note ID="1" FontSize="12.0" Position="89.050781,274.148438" Width="278.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1" Style="Jagged"></Border>
+            </Appearance>
+            <String>JavaFX WebView: Worker State == SUCEEDED</String>
+            <ConnectedNoteIDs>0, 3</ConnectedNoteIDs>
+            <PointsToNoteIDs>3</PointsToNoteIDs>
+        </Note>
+        <Note ID="3" FontSize="12.0" Position="117.238281,332.433594" Width="282.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1"></Border>
+            </Appearance>
+            <String>Java:
+DevToolsDebuggerJsBrindge.connectJSBridge()</String>
+            <ConnectedNoteIDs>1, 6</ConnectedNoteIDs>
+            <PointsToNoteIDs>6</PointsToNoteIDs>
+        </Note>
+        <Note ID="4" FontSize="12.0" Position="221.035156,147.136719" Width="200.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1"></Border>
+            </Appearance>
+            <String>JavaScript calls which require JsBridge are accumulated to run  when JsBridge is setup.</String>
+        </Note>
+        <Note ID="6" FontSize="12.0" Position="161.527344,401.355469" Width="303.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1"></Border>
+            </Appearance>
+            <String>JavaScript:
+markdownNavigator.setJsBridge()
+
+completes initialization and runs accumulated scripts which require JsBridge.</String>
+            <ConnectedNoteIDs>3</ConnectedNoteIDs>
+        </Note>
+        <Note ID="11" FontSize="12.0" Position="221.671875,99.765625" Width="253.0">
+            <Appearance>
+                <Alignment>Left</Alignment>
+                <Border Weight="1"></Border>
+            </Appearance>
+            <String>JavaScript:
+markdown-navigator.js</String>
+            <ConnectedNoteIDs>0</ConnectedNoteIDs>
+        </Note>
+    </Notes>
+    <BackgroundShapes></BackgroundShapes>
+    <NoteStyles>
+        <Style Name="Title Text" ID="26CD7242-6012-4B10-A0C3-3F37A221CF16" AffectFontStyle="Yes" AffectAlignment="Yes" AffectTextColor="No" AffectNoteBody="No" AffectFade="No">
+            <FontSize>28.0</FontSize>
+            <IsBold>Yes</IsBold>
+        </Style>
+        <Style Name="Red Text" ID="6BC43031-D690-4624-BEF3-76DB36EF9E62" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="Yes" AffectNoteBody="No" AffectFade="No">
+            <TextColor>1.0 0.0 0.0</TextColor>
+        </Style>
+        <Style Name="Brown Bubble" ID="61681A2F-EBF9-450B-9814-34A71ADA8EBC" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.290055 0.1523 0.182215</BorderColor>
+            <FillColor>0.940019 0.892907 0.779716</FillColor>
+        </Style>
+        <Style Name="Yellow Bubble" ID="D5C3FEE7-76D4-421E-A190-458690909109" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.756763 0.785592 0.373258</BorderColor>
+            <FillColor>0.906773 0.910625 0.634363</FillColor>
+        </Style>
+        <Style Name="Green Bubble" ID="DB845A25-26FC-45E6-BA80-08E1F5C66FA3" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.331867 0.609932 0.356197</BorderColor>
+            <FillColor>0.790123 0.882327 0.80198</FillColor>
+        </Style>
+        <Style Name="Blue Bubble" ID="4B1C6936-5C1E-4B2E-8A8D-8D0C63B3C5DC" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.477193 0.557066 0.76433</BorderColor>
+            <FillColor>0.840969 0.866828 0.925903</FillColor>
+        </Style>
+        <Style Name="Pink Bubble" ID="541392A8-4383-4B83-8186-D8D309185EF4" AffectFontStyle="No" AffectAlignment="No" AffectTextColor="No" AffectNoteBody="Yes" AffectFade="No">
+            <BorderThickness>1</BorderThickness>
+            <BorderColor>0.747881 0.366532 0.542813</BorderColor>
+            <FillColor>0.918452 0.807302 0.863467</FillColor>
+        </Style>
+    </NoteStyles>
+    <UISettings>
+        <BackgroundColor>1.0 1.0 1.0</BackgroundColor>
+        <DefaultFont>Helvetica</DefaultFont>
+        <DefaultTextColor>0.0 0.0 0.0</DefaultTextColor>
+    </UISettings>
+    <PrintSettings PaperSize="612.0,792.0" LeftMargin="72.0" RightMargin="72.0" TopMargin="90.0" BottomMargin="90.0" PaperType="8 1/2x11" Orientation="Portrait" HorizontalPagination="Clip" VerticalPagination="Auto" ScaleFactor="1.0" HorizontallyCentered="Yes" VerticallyCentered="Yes" Collates="Yes" PagesAcross="1" PagesDown="1"></PrintSettings>
+</ScappleDocument>
