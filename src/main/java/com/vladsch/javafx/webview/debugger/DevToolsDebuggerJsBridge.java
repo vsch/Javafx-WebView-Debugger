@@ -111,7 +111,6 @@ public class DevToolsDebuggerJsBridge {
         try {
             if (mySuppressNoMarkdownException) {
                 myWebView.getEngine().executeScript("var markdownNavigator; markdownNavigator && markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
-
             } else {
                 myWebView.getEngine().executeScript("markdownNavigator.setJsBridge(window.__MarkdownNavigator);");
             }
