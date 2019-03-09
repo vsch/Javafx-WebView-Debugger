@@ -17,8 +17,16 @@ package com.vladsch.javafx.webview.debugger;
 
 import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.scene.web.Debugger;
-import com.vladsch.boxed.json.*;
+import com.vladsch.boxed.json.BoxedJsArray;
+import com.vladsch.boxed.json.BoxedJsNumber;
+import com.vladsch.boxed.json.BoxedJsObject;
+import com.vladsch.boxed.json.BoxedJsString;
+import com.vladsch.boxed.json.BoxedJsValue;
+import com.vladsch.boxed.json.BoxedJson;
+import com.vladsch.boxed.json.MutableJsArray;
+import com.vladsch.boxed.json.MutableJsObject;
 import javafx.application.Platform;
+import javafx.scene.web.WebEngine;
 import javafx.util.Callback;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -28,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.json.JsonValue;
 import javax.swing.SwingUtilities;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +59,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     private static final String EMPTY_EVAL_SCRIPT = "// injected eval to pause immediately";
     private static final String EMPTY_EVAL_STEP_SCRIPT = "\"\";";
 
-    final @NotNull Debugger myDebugger;
+    final @Nullable Debugger myDebugger;
     final @NotNull JfxDebuggerAccess myJfxDebuggerAccess;
     Callback<String, Void> myCallback;
     final HashMap<Integer, Integer> myAsyncIdMap = new HashMap<>();     // mapping of result messages waiting reception from the debugger
@@ -97,11 +106,35 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         }
     }
 
-    public DevToolsDebugProxy(@NotNull final Debugger debugger, @NotNull final JfxDebuggerAccess jfxDebuggerAccess) {
+    @Nullable
+    public static Debugger getDebugger(@NotNull WebEngine engine) {
+        try {
+            Debugger debugger = engine.impl_getDebugger();
+            return debugger;
+        } catch (NoSuchMethodError error) {
+            Class webEngineClazz = WebEngine.class;
+
+            Field debuggerField = null;
+            try {
+                debuggerField = webEngineClazz.getDeclaredField("debugger");
+                debuggerField.setAccessible(true);
+                Debugger debugger = (Debugger) debuggerField.get(engine);
+                return debugger;
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    public DevToolsDebugProxy(@NotNull final WebEngine engine, @NotNull final JfxDebuggerAccess jfxDebuggerAccess) {
         myJfxDebuggerAccess = jfxDebuggerAccess;
-        myDebugger = debugger;
+        myDebugger = getDebugger(engine);
         clearState();
-        myDebugger.setMessageCallback(this);
+
+        if (myDebugger != null) {
+            myDebugger.setMessageCallback(this);
+        }
     }
 
     private void clearState() {
@@ -152,7 +185,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         myIsShuttingDown = shuttingDown;
         if (myDebuggerIsPaused.get()) {
             Runnable action = () -> {
-                if (myDebugger.isEnabled()) {
+                if (myDebugger != null && myDebugger.isEnabled()) {
                     if (myOnDebuggerResumedRunnable == null) {
                         myOnDebuggerResumedRunnable = runnable;
                     } else if (runnable != null) {
@@ -214,7 +247,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
     @Override
     public void removeAllBreakpoints(final @Nullable Runnable runAfter) {
-        if (!myIsEnabled) return;
+        if (!myIsEnabled || myDebugger == null) return;
 
         // must be called on javafx thread, debugger can be paused or not
         Platform.runLater(() -> {
@@ -269,18 +302,20 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     }
 
     void debuggerSend(String message, final String evalAfter) {
-        mySendNesting++;
-        String wasIndent = mySendNestingIndent;
-        mySendNestingIndent += "  ";
-        logMessage(String.format("%sSending %s", mySendNestingIndent, message));
-        myDebugger.sendMessage(message);
-        if (evalAfter != null) {
-            yieldDebugger(() -> {
-                myJfxDebuggerAccess.eval(evalAfter);
-            });
+        if (myDebugger != null) {
+            mySendNesting++;
+            String wasIndent = mySendNestingIndent;
+            mySendNestingIndent += "  ";
+            logMessage(String.format("%sSending %s", mySendNestingIndent, message));
+            myDebugger.sendMessage(message);
+            if (evalAfter != null) {
+                yieldDebugger(() -> {
+                    myJfxDebuggerAccess.eval(evalAfter);
+                });
+            }
+            mySendNestingIndent = wasIndent;
+            mySendNesting--;
         }
-        mySendNestingIndent = wasIndent;
-        mySendNesting--;
     }
 
     /**
@@ -546,6 +581,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
      * Call back to send message to remote from the debugger
      *
      * @param param json
+     *
      * @return void
      */
     @Override
@@ -595,7 +631,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                 if (myIsShuttingDown) {
                     // make it continue so it does not hang the app
                     yieldDebugger(() -> {
-                        if (myIsEnabled) {
+                        if (myDebugger != null && myIsEnabled) {
                             // let's see the reason, if it is a break point, we delete it
                             //{"method":"Debugger.paused","params":{"callFrames":[{"callFrameId":"{\"ordinal\":0,\"injectedScriptId\":3}","functionName":"","location":{"scriptId":"81","lineNumber":10,"columnNumber":16},"scopeChain":[{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":174}","className":"JSLexicalEnvironment","description":"JSLexicalEnvironment"},"type":"local"},{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":175}","className":"JSLexicalEnvironment","description":"JSLexicalEnvironment"},"type":"closure"},{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":176}","className":"JSLexicalEnvironment","description":"JSLexicalEnvironment"},"type":"closure"},{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":177}","className":"JSLexicalEnvironment","description":"JSLexicalEnvironment"},"type":"closure"},{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":178}","className":"JSLexicalEnvironment","description":"JSLexicalEnvironment"},"type":"closure"},{"object":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":179}","className":"Window","description":"Window"},"type":"global"}],"this":{"type":"object","objectId":"{\"injectedScriptId\":3,\"id\":180}","subtype":"node","className":"HTMLDivElement","description":"div.adm-block.adm-example.adm-collapsed"}}],"reason":"Breakpoint","data":{"breakpointId":"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:10:0"}}}
                             //{
@@ -1060,7 +1096,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                             && jsAwaitPromise.isFalse()
                             && jsReturnByValue.isFalse()
                             && jsId.isValid()
-                            ) {
+                    ) {
 
                         final String evalExpression;
                         if (jsIncludeConsoleAPI.isTrue()) {
@@ -1213,7 +1249,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                     // {"id":108,"method":"Overlay.setPausedInDebuggerMessage"}
                     // Response:
                     // {"result":{},"id":177}
-                    if (myDebugger.isEnabled() && jsId.isValid()) {
+                    if (myDebugger != null && myDebugger.isEnabled() && jsId.isValid()) {
                         int responseId = jsId.intValue();
                         yieldDebugger(() -> {
                             call(String.format("{\"result\":{},\"id\":%d}", responseId));
@@ -1230,7 +1266,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                     //  {"id":43,"method":"Overlay.highlightNode","params":{"highlightConfig":{"showInfo":true,"showRulers":false,"showExtensionLines":false,"contentColor":{"r":111,"g":168,"b":220,"a":0.66},"paddingColor":{"r":147,"g":196,"b":125,"a":0.55},"borderColor":{"r":255,"g":229,"b":153,"a":0.66},"marginColor":{"r":246,"g":178,"b":107,"a":0.66},"eventTargetColor":{"r":255,"g":196,"b":196,"a":0.66},"shapeColor":{"r":96,"g":82,"b":177,"a":0.8},"shapeMarginColor":{"r":96,"g":82,"b":127,"a":0.6},"displayAsMaterial":true,"cssGridColor":{"r":75,"g":0,"b":130}},"nodeId":2}}
                     // Response:
                     // {"result":{},"id":177}
-                    if (myDebugger.isEnabled() && jsId.isValid()) {
+                    if (myDebugger != null && myDebugger.isEnabled() && jsId.isValid()) {
                         int responseId = jsId.intValue();
                         BoxedJsObject jsParams = json.get("params").asJsObject();
                         BoxedJsNumber jsNodeId = jsParams.getJsonNumber("nodeId");
@@ -1311,7 +1347,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                     //  {"id":64,"method":"Overlay.hideHighlight"}
                     // Response:
                     // {"result":{},"id":177}
-                    if (myDebugger.isEnabled() && jsId.isValid()) {
+                    if (myDebugger != null && myDebugger.isEnabled() && jsId.isValid()) {
                         int responseId = jsId.intValue();
                         yieldDebugger(() -> {
                             call(String.format("{\"result\":{},\"id\":%d}", responseId));
@@ -1377,7 +1413,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
             changedMessage = json.toString();
         }
 
-        if (myDebugger.isEnabled()) {
+        if (myDebugger != null && myDebugger.isEnabled()) {
             debuggerSend(changedMessage, null);
             if (evalScript != null) {
                 myJfxDebuggerAccess.eval(evalScript);
@@ -1413,13 +1449,15 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
     @Override
     public boolean isEnabled() {
-        myIsEnabled = myDebugger.isEnabled();
+        myIsEnabled = myDebugger != null && myDebugger.isEnabled();
         return myIsEnabled;
     }
 
     @Override
     public void setEnabled(final boolean enabled) {
-        myIsEnabled = enabled;
-        myDebugger.setEnabled(myIsEnabled);
+        if (myDebugger != null) {
+            myIsEnabled = enabled;
+            myDebugger.setEnabled(myIsEnabled);
+        }
     }
 }

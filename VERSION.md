@@ -3,6 +3,7 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.7.0](#070)
 - [0.6.10](#0610)
 - [0.6.8](#068)
 - [0.6.6](#066)
@@ -14,6 +15,13 @@
 - [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.7.0
+
+* Fix: change constructor params from `Debugger` to `WebEngine` so that `DevToolsDebugProxy` is
+  responsible for obtaining the debugger instance, if it can.
+* Fix: change debug proxy debugger field to nullable to allow the rest of the app to work even
+  if obtaining the debugger is not possible on the JRE version.
 
 ### 0.6.10
 

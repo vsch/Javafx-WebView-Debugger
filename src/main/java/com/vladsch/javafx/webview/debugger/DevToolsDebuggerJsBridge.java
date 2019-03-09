@@ -28,6 +28,7 @@ package com.vladsch.javafx.webview.debugger;
 import com.sun.javafx.scene.web.Debugger;
 import com.vladsch.boxed.json.*;
 import javafx.application.Platform;
+import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -62,19 +63,18 @@ public class DevToolsDebuggerJsBridge {
     final int myInstance;
     final boolean mySuppressNoMarkdownException;
 
-    @SuppressWarnings("deprecation")
-    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final Debugger debugger, int instance, @Nullable JfxScriptStateProvider stateProvider) {
-        this(webView, debugger, instance, stateProvider, false);
+    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final @NotNull WebEngine engine, int instance, @Nullable JfxScriptStateProvider stateProvider) {
+        this(webView, engine, instance, stateProvider, false);
     }
 
-    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final Debugger debugger, int instance, @Nullable JfxScriptStateProvider stateProvider, boolean suppressNoMarkdownException) {
+    public DevToolsDebuggerJsBridge(@NotNull final WebView webView, final @NotNull WebEngine engine, int instance, @Nullable JfxScriptStateProvider stateProvider, boolean suppressNoMarkdownException) {
         myWebView = webView;
         myInstance = instance;
         myStateProvider = stateProvider;
         myJfxDebuggerAccess = new JfxDebuggerAccessImpl();
         myJfxScriptArgAccessor = new JfxScriptArgAccessorDelegate(new JfxScriptArgAccessorImpl());
         myJfxDebugProxyJsBridge = new JfxDebugProxyJsBridgeDelegate(new JfxDebugProxyJsBridgeImpl());
-        myDebugger = new DevToolsDebugProxy(debugger, myJfxDebuggerAccess);
+        myDebugger = new DevToolsDebugProxy(engine, myJfxDebuggerAccess);
         mySuppressNoMarkdownException = suppressNoMarkdownException;
     }
 
@@ -317,6 +317,8 @@ public class DevToolsDebuggerJsBridge {
      * Interface implementation for proxy to get access and do callbacks
      */
     private class JfxDebuggerAccessImpl implements JfxDebuggerAccess {
+        JfxDebuggerAccessImpl() {}
+
         @Override
         public void onConnectionOpen() {
             DevToolsDebuggerJsBridge.this.onConnectionOpen();
@@ -420,6 +422,8 @@ public class DevToolsDebuggerJsBridge {
     }
 
     private class JfxScriptArgAccessorImpl implements JfxScriptArgAccessor {
+        JfxScriptArgAccessorImpl() {}
+
         @Override
         public @Nullable Object getArg() {
             return myArg;
@@ -440,6 +444,8 @@ public class DevToolsDebuggerJsBridge {
      * script markdown-navigator.js
      */
     private class JfxDebugProxyJsBridgeImpl implements JfxDebugProxyJsBridge {
+        JfxDebugProxyJsBridgeImpl() {}
+
         /**
          * Called by JavaScript helper to signal all script operations are complete
          * <p>
