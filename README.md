@@ -48,7 +48,7 @@ For Maven:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.6.10</version>
+    <version>0.7.2</version>
 </dependency>
 ```
 
@@ -165,8 +165,8 @@ However, these are the instructions to compile for Java 9 WebView debugger acces
 
 `WebEngine.impl_getDebugger()` is an internal API and is subject to change which is happened in
 Java 9. So if you are using Java 9, you need to use following code instead to start the debug
-server.  
-  
+server.
+
 :information_source: This code is now part of `DevToolsDebugProxy` and if it works on the JRE then debugging will
 be available. Otherwise, it will not.
 
@@ -210,7 +210,7 @@ Execution, Deployment > Compiler > Java Compiler**.
 [Web View Debug Sample]: https://github.com/vsch/WebViewDebugSample
 [Javafx Web View Debugger Readme]: https://github.com/vsch/Javafx-WebView-Debugger/blob/master/README.md
 [JavaFx WebView Debugger]: https://github.com/vsch/Javafx-WebView-Debugger
-[Kotlin]: http://kotlinlang.org
+[Kotlin]: https://kotlinlang.org
 [TooTallNate/Java-WebSocket]: https://github.com/TooTallNate/Java-WebSocket
 [WebViewDebugSample.jar]: https://github.com/vsch/WebViewDebugSample/raw/master/WebViewDebugSample.jar
 
