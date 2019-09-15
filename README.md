@@ -48,7 +48,7 @@ For Maven:
 <dependency>
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.7.4</version>
+    <version>0.7.6</version>
 </dependency>
 ```
 

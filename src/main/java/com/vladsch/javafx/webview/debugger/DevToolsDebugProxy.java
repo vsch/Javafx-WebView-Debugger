@@ -254,7 +254,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
             // one of those left over break points
             // Before resuming, remove all break points
             ArrayList<String> breakPoints = new ArrayList<>(myBreakpoints.keySet());
-            BoxedJsObject jsRemoveBreakPoint = BoxedJson.from("{\"id\":454,\"method\":\"Debugger.removeBreakpoint\",\"params\":{\"breakpointId\":\"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0\"}}");
+            BoxedJsObject jsRemoveBreakPoint = BoxedJson.boxedFrom("{\"id\":454,\"method\":\"Debugger.removeBreakpoint\",\"params\":{\"breakpointId\":\"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0\"}}");
             for (String breakpointId : breakPoints) {
                 // {"id":454,"method":"Debugger.removeBreakpoint","params":{"breakpointId":"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0"}}
                 jsRemoveBreakPoint.evalSet("id", myDebuggerId++)
@@ -447,7 +447,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
     private BoxedJsObject argParamJson() {
         final String evalScript = "{\"id\":0,\"method\":\"Runtime.evaluate\",\"params\":{\"expression\":\"\",\"objectGroup\":\"console\",\"includeCommandLineAPI\":true,\"silent\":false,\"contextId\":1,\"returnByValue\":false,\"generatePreview\":true,\"userGesture\":true,\"awaitPromise\":false}}";
-        return BoxedJson.from(evalScript);
+        return BoxedJson.boxedFrom(evalScript);
     }
 
     private void collectConsoleAPIParams(JfxConsoleApiArgs consoleArgs) {
@@ -536,7 +536,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         //
         BoxedJsObject json;//{"method":"Runtime.consoleAPICalled","params":{"type":"warning","args":[{"type":"string","value":"warning"}],"executionContextId":30,"timestamp":1519047166210.763,"stackTrace":{"callFrames":[{"functionName":"","scriptId":"684","url":"","lineNumber":0,"columnNumber":8}]}}}
 
-        json = BoxedJson.from(consoleArgs.getPausedParam());
+        json = BoxedJson.boxedFrom(consoleArgs.getPausedParam());
         final BoxedJsArray jsCallFrames = json.eval("params.callFrames").asJsArray();
         final MutableJsArray jsStackFrames = new MutableJsArray(jsCallFrames.size());
         int skipFrames = jsCallFrames.size() > 1 ? 1 : 0;
@@ -559,7 +559,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
         MutableJsArray args = new MutableJsArray(consoleArgs.getJsonParams().length);
         args.addAll(Arrays.asList(consoleArgs.getJsonParams()));
 
-        final BoxedJsObject consoleApiJson = BoxedJson.from("{\"method\":\"Runtime.consoleAPICalled\",\"params\":{\"type\":\"type\",\"args\":[],\"executionContextId\":30,\"stackTrace\":{\"callFrames\":[{\"functionName\":\"\",\"scriptId\":\"684\",\"url\":\"\",\"lineNumber\":0,\"columnNumber\":1}]}}}");
+        final BoxedJsObject consoleApiJson = BoxedJson.boxedFrom("{\"method\":\"Runtime.consoleAPICalled\",\"params\":{\"type\":\"type\",\"args\":[],\"executionContextId\":30,\"stackTrace\":{\"callFrames\":[{\"functionName\":\"\",\"scriptId\":\"684\",\"url\":\"\",\"lineNumber\":0,\"columnNumber\":1}]}}}");
         consoleApiJson.evalSet("params.type", consoleArgs.getLogType())
                 .evalSet("params.executionContextId", myLastPageContextId)
                 .evalSet("params.timestamp", consoleArgs.getTimestamp() / 1000000.0)
@@ -588,7 +588,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     public Void call(final String param) {
         // pre-process results here and possibly change or filter calls to debugger
         String changedParam = param;
-        BoxedJsObject json = BoxedJson.from(param);
+        BoxedJsObject json = BoxedJson.boxedFrom(param);
         boolean changed = false;
         boolean runOnEvalRunnables = false;
         final BoxedJsString method = json.get("method").asJsString();
@@ -622,9 +622,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                 final Consumer<String> runnable = myOnPausedParamsRunnable;
                 myOnPausedParamsRunnable = null;
                 if (runnable != null) {
-                    yieldDebugger(() -> {
-                        runnable.accept(param);
-                    });
+                    yieldDebugger(() -> runnable.accept(param));
                     return null;
                 }
 
@@ -648,7 +646,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                             if (breakpointId.isValid() && reason.getString().equals("Breakpoint")) {
                                 // remove the thing
                                 // {"id":454,"method":"Debugger.removeBreakpoint","params":{"breakpointId":"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0"}}
-                                BoxedJsObject jsRemoveBreakPoint = BoxedJson.from("{\"id\":454,\"method\":\"Debugger.removeBreakpoint\",\"params\":{\"breakpointId\":\"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0\"}}");
+                                BoxedJsObject jsRemoveBreakPoint = BoxedJson.boxedFrom("{\"id\":454,\"method\":\"Debugger.removeBreakpoint\",\"params\":{\"breakpointId\":\"file:///Users/vlad/src/sites/public/mn-resources/admonition.js:16:0\"}}");
                                 jsRemoveBreakPoint.evalSet("id", myDebuggerId++);
                                 jsRemoveBreakPoint.evalSet("params.breakpointId", breakpointId);
                                 String removeParam = jsRemoveBreakPoint.toString();
@@ -1032,7 +1030,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
             BoxedJsObject jsParentParams = myNodeIdMap.get(parentId);
             if (jsParentParams == null) {
-                jsParentParams = BoxedJson.from(String.format("{\"nodeId\":%d }", parentId));
+                jsParentParams = BoxedJson.boxedFrom(String.format("{\"nodeId\":%d }", parentId));
             }
 
             // save updated details for the node
@@ -1048,7 +1046,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     public void sendMessage(final String message) {
         // pre-process messages here and possibly filter/add other messages
         String changedMessage = message;
-        BoxedJsObject json = BoxedJson.from(message);
+        BoxedJsObject json = BoxedJson.boxedFrom(message);
         boolean changed = false;
         String evalScript = null;
 
@@ -1061,7 +1059,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
             switch (method) {
                 case "Runtime.compileScript": {
                     // change to harmless crap and fake the response
-                    json = BoxedJson.from(String.format("{\"id\":%s,\"method\":\"Runtime.enable\"}", jsId.intValue(myDebuggerId)));
+                    json = BoxedJson.boxedFrom(String.format("{\"id\":%s,\"method\":\"Runtime.enable\"}", jsId.intValue(myDebuggerId)));
                     changed = true;
                     myAsyncResultMap.put(myDebuggerId, RUNTIME_COMPILE_SCRIPT);
                     logMessage(String.format("Faking compileScript, request %d", jsId.intValue()));
@@ -1206,7 +1204,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                             for (String key : myBreakpoints.keySet()) {
                                 if (key.equals(breakPointId)) {
                                     // this one is it
-                                    BoxedJsObject jsResult = BoxedJson.from(myBreakpoints.get(key));
+                                    BoxedJsObject jsResult = BoxedJson.boxedFrom(myBreakpoints.get(key));
                                     jsResult.evalSet("id", json.get("id").asJsNumber());
                                     if (myCallback != null) {
                                         myCallback.call(jsResult.toString());
