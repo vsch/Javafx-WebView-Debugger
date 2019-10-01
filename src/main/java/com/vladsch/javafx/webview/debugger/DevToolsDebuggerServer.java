@@ -258,11 +258,6 @@ public class DevToolsDebuggerServer implements JfxDebuggerConnector {
     }
 
     public void sendMessageToBrowser(final String data) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                myDebugger.sendMessage(data);
-            }
-        });
+        Platform.runLater(() -> myDebugger.sendMessage(data));
     }
 }
