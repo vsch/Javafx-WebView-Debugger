@@ -109,17 +109,18 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     @Nullable
     public static Debugger getDebugger(@NotNull WebEngine engine) {
         try {
+            // DEPRECATED: no replacement
+            @SuppressWarnings("deprecation")
             Debugger debugger = engine.impl_getDebugger();
             return debugger;
         } catch (NoSuchMethodError error) {
-            Class webEngineClazz = WebEngine.class;
+            Class<?> webEngineClazz = WebEngine.class;
 
             Field debuggerField = null;
             try {
                 debuggerField = webEngineClazz.getDeclaredField("debugger");
                 debuggerField.setAccessible(true);
-                Debugger debugger = (Debugger) debuggerField.get(engine);
-                return debugger;
+                return (Debugger) debuggerField.get(engine);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 e.printStackTrace();
                 return null;
