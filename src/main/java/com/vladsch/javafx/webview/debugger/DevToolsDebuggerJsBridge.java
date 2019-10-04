@@ -514,7 +514,7 @@ public class DevToolsDebuggerJsBridge {
                 if (state != null) {
                     // convert JSObject to Element others to attributes
                     try {
-                        JsonValue value = null;
+                        BoxedJsValue value = null;
                         if (state instanceof Integer) value = BoxedJson.boxedOf((int) state);
                         else if (state instanceof Boolean) value = BoxedJson.boxedOf((boolean) state);
                         else if (state instanceof Double) value = BoxedJson.boxedOf((double) state);
@@ -530,7 +530,7 @@ public class DevToolsDebuggerJsBridge {
 
                             value = BoxedJson.boxedFrom(jsonString);
                         }
-                        if (value != null && ((BoxedJsValue) value).isValid()) {
+                        if (value != null && value.isValid()) {
                             scriptState.put(name, value);
                         }
                     } catch (Throwable e) {
