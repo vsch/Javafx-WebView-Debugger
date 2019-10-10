@@ -1174,7 +1174,6 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                         return;
                     }
                     myPageReloadStarted = true;
-                    int tmp = 0;
                     break;
                 }
 
