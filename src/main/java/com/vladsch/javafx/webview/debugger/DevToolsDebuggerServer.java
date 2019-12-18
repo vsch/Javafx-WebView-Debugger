@@ -18,7 +18,6 @@ package com.vladsch.javafx.webview.debugger;
 import com.sun.javafx.scene.web.Debugger;
 import javafx.application.Platform;
 import netscape.javascript.JSObject;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,12 +27,11 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 public class DevToolsDebuggerServer implements JfxDebuggerConnector {
-    private static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
-
     final static HashMap<Integer, JfxWebSocketServer> ourServerMap = new HashMap<>();
 
     final Debugger myDebugger;
     JfxWebSocketServer myServer;
+    final LogHandler LOG = LogHandler.getInstance();
 
     public DevToolsDebuggerServer(@NotNull Debugger debugger, int debuggerPort, final int instanceId, @Nullable Consumer<Throwable> onFailure, @Nullable Runnable onStart) {
         myDebugger = debugger;
@@ -213,45 +211,52 @@ public class DevToolsDebuggerServer implements JfxDebuggerConnector {
         }
     }
 
-    @Override public void setDebugOnLoad(final DebugOnLoad debugOnLoad) {
+    @Override
+    public void setDebugOnLoad(final DebugOnLoad debugOnLoad) {
         if (myDebugger instanceof JfxDebuggerProxy) {
             ((JfxDebuggerProxy) myDebugger).setDebugOnLoad(debugOnLoad);
         }
     }
 
-    @Override public DebugOnLoad getDebugOnLoad() {
+    @Override
+    public DebugOnLoad getDebugOnLoad() {
         if (myDebugger instanceof JfxDebuggerProxy) {
             return ((JfxDebuggerProxy) myDebugger).getDebugOnLoad();
         }
         return DebugOnLoad.NONE;
     }
 
-    @Override public void debugBreak() {
+    @Override
+    public void debugBreak() {
         if (myDebugger instanceof JfxDebuggerProxy) {
             ((JfxDebuggerProxy) myDebugger).debugBreak();
         }
     }
 
-    @Override public boolean isDebuggerPaused() {
+    @Override
+    public boolean isDebuggerPaused() {
         if (myDebugger instanceof JfxDebuggerProxy) {
             return ((JfxDebuggerProxy) myDebugger).isDebuggerPaused();
         }
         return false;
     }
 
-    @Override public void releaseDebugger(final boolean shuttingDown, @Nullable Runnable runnable) {
+    @Override
+    public void releaseDebugger(final boolean shuttingDown, @Nullable Runnable runnable) {
         if (myDebugger instanceof JfxDebuggerProxy) {
             ((JfxDebuggerProxy) myDebugger).releaseDebugger(shuttingDown, runnable);
         }
     }
 
-    @Override public void removeAllBreakpoints(@Nullable Runnable runnable) {
+    @Override
+    public void removeAllBreakpoints(@Nullable Runnable runnable) {
         if (myDebugger instanceof JfxDebuggerProxy) {
             ((JfxDebuggerProxy) myDebugger).removeAllBreakpoints(runnable);
         }
     }
 
-    @Override public void pageLoadComplete() {
+    @Override
+    public void pageLoadComplete() {
         if (myDebugger instanceof JfxDebuggerProxy) {
             ((JfxDebuggerProxy) myDebugger).pageLoadComplete();
         }

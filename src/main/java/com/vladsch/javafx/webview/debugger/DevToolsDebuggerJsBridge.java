@@ -25,14 +25,14 @@
 
 package com.vladsch.javafx.webview.debugger;
 
-import com.sun.javafx.scene.web.Debugger;
-import com.vladsch.boxed.json.*;
+import com.vladsch.boxed.json.BoxedJsObject;
+import com.vladsch.boxed.json.BoxedJsValue;
+import com.vladsch.boxed.json.BoxedJson;
 import javafx.application.Platform;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,8 +45,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public class DevToolsDebuggerJsBridge {
-    protected static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
-
     final @NotNull JfxDebuggerAccess myJfxDebuggerAccess;
     final @NotNull JfxScriptArgAccessor myJfxScriptArgAccessor;
     final @NotNull JfxDebugProxyJsBridge myJfxDebugProxyJsBridge;
@@ -54,6 +52,7 @@ public class DevToolsDebuggerJsBridge {
     final @NotNull DevToolsDebugProxy myDebugger;
     final @Nullable JfxScriptStateProvider myStateProvider;
     @Nullable String myJSEventHandledBy;
+    final LogHandler LOG = LogHandler.getInstance();
 
     private final long myNanos = System.nanoTime();
     private final long myMilliNanos = System.currentTimeMillis() * 1000000;

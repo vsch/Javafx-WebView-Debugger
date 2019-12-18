@@ -30,7 +30,6 @@ import javafx.scene.web.WebEngine;
 import javafx.util.Callback;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
-import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +54,6 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     final static int REQUEST_JS_BRIDGE = 8;
     final static int DOM_GET_DOCUMENT = 9; // result is dom get document response
 
-    private static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
     private static final String EMPTY_EVAL_SCRIPT = "// injected eval to pause immediately";
     private static final String EMPTY_EVAL_STEP_SCRIPT = "\"\";";
 
@@ -88,6 +86,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
     private boolean myIsShuttingDown;
     private HashMap<Integer, BoxedJsObject> myNodeIdMap = new HashMap<>(); // node id to params of DOM.setChildNodes method from webView with "parentId" added to each node and "ordinal" position in parent's children
     private int myRootNodeId = 0; // this is the document node id
+    final LogHandler LOG = LogHandler.getInstance();
 
     // reflects the last command received for debugger
     // needed so that after pausing for console log stack trace, we can use the same

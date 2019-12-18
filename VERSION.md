@@ -3,6 +3,7 @@
 [TOC levels=3,6]: # "Version History"
 
 ### Version History
+- [0.8.0](#080)
 - [0.7.8](#078)
 - [0.7.6](#076)
 - [0.7.4](#074)
@@ -19,6 +20,10 @@
 - [0.5.8](#058)
 - [0.5.6](#056)
 
+
+### 0.8.0
+
+* Fix: remove dependency on Log4j and add interface to logger handler by app
 
 ### 0.7.8
 

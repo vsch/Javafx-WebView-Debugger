@@ -15,7 +15,6 @@
 
 package com.vladsch.javafx.webview.debugger;
 
-import org.apache.log4j.Logger;
 import org.java_websocket.WebSocket;
 import org.java_websocket.exceptions.WebsocketNotConnectedException;
 import org.java_websocket.framing.CloseFrame;
@@ -40,9 +39,8 @@ public class JfxWebSocketServer extends WebSocketServer {
     final private HashMap<JfxDebuggerConnector, String> myServerIds = new HashMap<>();
     private Consumer<Throwable> onFailure;
     private Consumer<JfxWebSocketServer> onStart;
-    private AtomicInteger myServerUseCount = new AtomicInteger(0);
-
-    private static final Logger LOG = Logger.getLogger("com.vladsch.javafx.webview.debugger");
+    private final AtomicInteger myServerUseCount = new AtomicInteger(0);
+    final LogHandler LOG = LogHandler.getInstance();
 
     public JfxWebSocketServer(InetSocketAddress address, @Nullable Consumer<Throwable> onFailure, @Nullable Consumer<JfxWebSocketServer> onStart) {
         super(address, 4);
@@ -170,7 +168,8 @@ public class JfxWebSocketServer extends WebSocketServer {
         if (LOG.isDebugEnabled()) System.out.println("received ByteBuffer from " + conn.getRemoteSocketAddress());
     }
 
-    @Override public void stop(final int timeout) throws InterruptedException {
+    @Override
+    public void stop(final int timeout) throws InterruptedException {
         try {
             super.stop(timeout);
         } catch (Exception ex) {

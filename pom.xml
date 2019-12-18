@@ -12,7 +12,7 @@
 
     <groupId>com.vladsch.javafx-webview-debugger</groupId>
     <artifactId>javafx-webview-debugger</artifactId>
-    <version>0.7.8</version>
+    <version>0.8.0</version>
     <name>Javafx WebView Debugger</name>
     <description>
         Full function debugging implementation for JavaFX WebView using Chrome Dev Tools via web-socket server
@@ -44,13 +44,6 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
         </dependency>
     </dependencies>
 
