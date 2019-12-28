@@ -234,7 +234,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
 
         //myIsShuttingDown = true; // this messes it up, don't do it, shutdown is when the user turns off debugging
 
-        // TODO: return to not yet connected condition
+        // FIX: return to not yet connected condition
         removeAllBreakpoints(() -> {
             releaseDebugger(true, () -> {
                 //noinspection Convert2MethodRef
@@ -1176,7 +1176,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                     break;
                 }
 
-                // TODO: need to figure out what the correct response to this would be
+                // FIX: need to figure out what the correct response to this would be
                 // probably a list of break point ids
                 // Request:
                 // {"id":449,"method":"Debugger.getPossibleBreakpoints","params":{"start":{"scriptId":"220","lineNumber":14,"columnNumber":0},"end":{"scriptId":"220","lineNumber":15,"columnNumber":0},"restrictToFunction":false}}

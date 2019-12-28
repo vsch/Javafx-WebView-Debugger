@@ -89,7 +89,7 @@ window.console = console;
 markdownNavigator = (function () {
     "use strict";
 
-    // TODO: change this for real implementation using computed CSS properties of element
+    // FIX: change this for real implementation using computed CSS properties of element
     // and an overlay element
     const HIGHLIGHT = "markdown-navigator-highlight";
     const HIGHLIGHT_STYLE = document.createElement("style");
@@ -205,7 +205,7 @@ markdownNavigator = (function () {
                     }
 
                     if (child.nodeName.startsWith("#")) {
-                        // TODO: when overlays are implemented to handle non-element nodes, highlight the child
+                        // FIX: when overlays are implemented to handle non-element nodes, highlight the child
                         break;
                     }
 
