@@ -218,7 +218,7 @@ public class DevToolsDebuggerJsBridge {
      * @param onFailure call back on failure
      * @param onStart   call back on success
      */
-    public void startDebugServer(final int port, Consumer<Throwable> onFailure, Runnable onStart) {
+    public void startDebugServer(final int port, @Nullable Consumer<Throwable> onFailure, @Nullable Runnable onStart) {
         if (myDebuggerServer == null) {
             Platform.runLater(() -> {
                 DevToolsDebuggerServer[] debuggerServer = new DevToolsDebuggerServer[] { null };
