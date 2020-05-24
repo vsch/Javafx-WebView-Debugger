@@ -130,7 +130,7 @@ public class DevToolsDebugProxy implements Debugger, JfxDebuggerProxy, Callback<
                 debuggerField = webEngineClazz.getDeclaredField("debugger");
                 debuggerField.setAccessible(true);
                 return (Debugger) debuggerField.get(engine);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
                 return null;
             }
